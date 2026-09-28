@@ -8,3 +8,9 @@ One entry per decision or new dependency: what, why, alternative rejected.
 - **Why:** the team has no Anthropic API credits. A Claude.ai subscription does not include API access (CLAUDE.md §10). Gemini offers a free-tier vision model.
 - **Rejected:** `claude` provider (no credits); `manual` provider as the main path (it is not AI and must always carry a "Manual transcription" badge; it stays as a fallback only).
 - **Rules unchanged:** the model only transcribes text with the exact §10 prompt; its output is validated with zod; all matching is deterministic and runs in the browser.
+
+## D2: examseal-core dependencies (H0)
+
+- **What:** `shamir-secret-sharing@0.0.4`, `@noble/curves@1.9.7`, `@noble/hashes@1.8.0` (exact pins from CLAUDE.md §7), `viem@2.56.9` (the version the frontend already resolves, so there is one copy in the bundle), and `vitest@5.0.2` for tests.
+- **Why:** §7 names these libraries; vitest is the test runner named in §4 and §13.
+- **Rejected:** noble 2.x (ESM-only, §7 says do not upgrade); jest (slower TS setup, no benefit here).
