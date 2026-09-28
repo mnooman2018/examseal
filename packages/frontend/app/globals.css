@@ -158,9 +158,9 @@ th { color: var(--ink-soft); font-weight: 600; }
 .tile-bad { border-left-color: var(--red); background: rgba(229, 72, 77, 0.1); }
 .tile-bar { display: flex; gap: 3px; }
 .seg { flex: 1; height: 6px; background: var(--line); }
-.seg-on { background: var(--amber); }
-.tile-ok .seg-on { background: var(--green); }
-.tile-bad .seg-on { background: var(--red); }
+.seg-pending { background: var(--amber); }
+.seg-ok { background: var(--green); }
+.seg-bad { background: var(--red); }
 .seg-threshold { box-shadow: 2px 0 0 var(--ink-soft); }
 
 /* ---------- timeline ---------- */

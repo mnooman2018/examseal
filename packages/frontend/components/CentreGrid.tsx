@@ -1,6 +1,7 @@
 import type { Centre, Exam } from "@/hooks/useExam";
 import { centreLabel } from "@/lib/format";
 import { StatusPill } from "./StatusPill";
+import { ApprovalBar } from "./ApprovalBar";
 
 /** Grid of centre tiles: status + approvals x/N. Tiles take their state colour from chain status only. */
 export function CentreGrid({ exam, centres }: { exam: Exam; centres: Centre[] }) {
@@ -16,11 +17,7 @@ export function CentreGrid({ exam, centres }: { exam: Exam; centres: Centre[] })
             <div className="tile-approvals mono">
               {c.approvals}/{n}
             </div>
-            <div className="tile-bar" aria-hidden>
-              {Array.from({ length: n }, (_, i) => (
-                <span key={i} className={`seg ${i < c.approvals ? "seg-on" : ""} ${i === exam.threshold - 1 ? "seg-threshold" : ""}`} />
-              ))}
-            </div>
+            <ApprovalBar centre={c} total={n} threshold={exam.threshold} />
             <StatusPill status={c.status === "Sealed" && c.approvals > 0 ? "Awaiting release" : c.status} />
           </div>
         );
