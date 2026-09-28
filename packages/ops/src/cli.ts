@@ -21,6 +21,8 @@ Commands:
   release --exam <id> --custodian 4[,5] [--wait]
       Release scripted custodian 4 and/or 5's pieces for every centre (one tx each).
       Refuses before release time unless --wait (waits in chain time, then sends).
+  candidates --exam <id> [--seats 30]
+      Write the exam's seat variants (candidates.secret.json) for seat-level tracing (D9).
   simulate [--trials 1000] [--seed examseal-sim-v1] [--codebooks 5]
       Run the §10 matcher simulation and write docs/SIMULATION.md (exit 2 if a target is missed).
 `;
@@ -48,6 +50,7 @@ async function main(argv: string[]): Promise<number> {
       rpc: { type: "string" },
       contract: { type: "string" },
       "out-root": { type: "string" },
+      seats: { type: "string" },
       custodian: { type: "string" },
       wait: { type: "boolean" },
       "secrets-root": { type: "string" },
@@ -96,6 +99,10 @@ async function main(argv: string[]): Promise<number> {
         );
       }
       return 0;
+    }
+    case "candidates": {
+      const { candidates } = await import("./candidates");
+      return candidates({ exam: values.exam, seats: values.seats, paper: values.paper, secretsRoot: values["secrets-root"] });
     }
     case "simulate": {
       const { simulate } = await import("./simulate");

@@ -1,4 +1,4 @@
-import { type CentreCode, type MasterPaper, validateMasterPaper } from "examseal-core";
+import { type CandidateCode, type CentreCode, type MasterPaper, validateMasterPaper } from "examseal-core";
 
 // Parsers for the two authority files /trace needs. Both are read into React state only:
 // never persisted, never sent to any server (§10 step 4).
@@ -43,4 +43,32 @@ export function parseCodebookFile(raw: unknown, master: MasterPaper): ParseResul
   }
   if (new Set(out.map((c) => c.centreId)).size !== out.length) return { ok: false, error: "Duplicate centre ids in the codebook." };
   return { ok: true, value: out.sort((a, b) => a.centreId - b.centreId) };
+}
+
+/**
+ * candidates.secret.json (D9): { version, examId, seats, candidates: CandidateCode[] }. Seat variants are
+ * derived from each exam's centre keys, so the file must belong to the exam being traced. Every seat
+ * must belong to a centre in the loaded codebook and cover the master paper's questions.
+ */
+export function parseCandidatesFile(raw: unknown, master: MasterPaper, codebook: CentreCode[], examId: string): ParseResult<CandidateCode[]> {
+  if (!raw || typeof raw !== "object" || Array.isArray(raw)) return { ok: false, error: "Not a JSON object." };
+  const o = raw as { examId?: unknown; candidates?: unknown };
+  if (!Array.isArray(o.candidates) || o.candidates.length === 0) return { ok: false, error: "No candidates list. Is this candidates.secret.json?" };
+  if (String(o.examId) !== examId) {
+    return { ok: false, error: `This seat file is for exam #${String(o.examId)}, but you are tracing exam #${examId}. Seat variants differ per exam.` };
+  }
+  const centres = new Set(codebook.map((c) => c.centreId));
+  const want = master.questions.map((q) => q.id).sort().join();
+  const out: CandidateCode[] = [];
+  for (const c of o.candidates as Partial<CandidateCode>[]) {
+    if (!Number.isInteger(c.centreId) || !Number.isInteger(c.seat)) return { ok: false, error: "A seat entry has no centreId or seat." };
+    if (!centres.has(c.centreId!)) return { ok: false, error: `Seat file has centre ${c.centreId}, which is not in the codebook.` };
+    if (!Array.isArray(c.order) || [...c.order].sort().join() !== want) return { ok: false, error: `Centre ${c.centreId} seat ${c.seat}: question order does not match this paper.` };
+    for (const q of master.questions.map((x) => x.id)) {
+      if (!isPerm4(c.optionPerms?.[q])) return { ok: false, error: `Centre ${c.centreId} seat ${c.seat}: bad option order for ${q}.` };
+      if (c.wordings?.[q] !== 0 && c.wordings?.[q] !== 1) return { ok: false, error: `Centre ${c.centreId} seat ${c.seat}: bad wording for ${q}.` };
+    }
+    out.push({ centreId: c.centreId!, seat: c.seat!, order: [...c.order], optionPerms: { ...c.optionPerms! }, wordings: { ...c.wordings! } });
+  }
+  return { ok: true, value: out };
 }

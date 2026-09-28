@@ -22,3 +22,6 @@ export * from "./forensic/score";
 export * from "./forensic/decide";
 export * from "./forensic/evidence";
 export * from "./forensic/synthetic";
+export * from "./candidate";
+export * from "./forensic/seat";
+export * from "./forensic/pasted";
