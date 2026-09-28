@@ -1,6 +1,6 @@
 import { readFileSync, statSync } from "node:fs";
 import path from "node:path";
-import { DEFAULT_GEMINI_MODEL, EXTRACT_MAX_IMAGE_BYTES, ExtractorError, extractWithGemini } from "examseal-core";
+import { EXTRACT_MAX_IMAGE_BYTES, ExtractorError, GEMINI_VISION_MODELS, extractWithGemini } from "examseal-core";
 import { UserError, loadEnv, userPath } from "./env";
 
 /**
@@ -40,23 +40,28 @@ export async function checkExtractor(imagePath: string | undefined): Promise<num
   loadEnv();
   const apiKey = process.env.GEMINI_API_KEY?.trim();
   if (!apiKey) throw new UserError("GEMINI_API_KEY is not set in .env.local");
-  const model = process.env.GEMINI_MODEL?.trim() || DEFAULT_GEMINI_MODEL;
+  const preferred = process.env.GEMINI_MODEL?.trim() || undefined;
+  const order = [...new Set([preferred, ...GEMINI_VISION_MODELS].filter(Boolean))];
 
-  console.error(`Sending ${path.basename(file)} (${(size / 1e6).toFixed(2)} MB, ${mediaType}) to ${model}…`);
+  console.error(`Sending ${path.basename(file)} (${(size / 1e6).toFixed(2)} MB, ${mediaType})`);
+  console.error(`  model order: ${order.join(" → ")}${preferred ? " (first one from GEMINI_MODEL)" : ""}`);
   const started = Date.now();
   try {
     const r = await extractWithGemini({
       apiKey,
-      model,
+      model: preferred,
       imageBase64: readFileSync(file).toString("base64"),
       mediaType,
-      onAttempt: (n, err) => console.error(`  attempt ${n}: ${err ?? "valid Extraction"}`),
+      budgetMs: 120_000, // the CLI can wait longer than the 60 s web route
+      onAttempt: (a) =>
+        console.error(`  ${a.model} attempt ${a.attempt}: ${a.ok ? "valid Extraction" : `${a.kind}: ${a.error}`}`),
     });
     console.log(JSON.stringify(r.extraction, null, 2));
     const x = r.extraction;
     if (r.usage) console.error(`  tokens: ${JSON.stringify(r.usage)}`);
     console.error(
-      `\n${x.questions.length} question(s), ${x.questions.reduce((n, q) => n + q.options.length, 0)} option(s), legibility: ${x.legibility}` +
+      `\nModel that answered: ${r.model} (${r.attempts} call${r.attempts === 1 ? "" : "s"} in total)` +
+        `\n${x.questions.length} question(s), ${x.questions.reduce((n, q) => n + q.options.length, 0)} option(s), legibility: ${x.legibility}` +
         ` · ${((Date.now() - started) / 1000).toFixed(1)} s`,
     );
     return 0;

@@ -6,7 +6,10 @@ export const runtime = "nodejs";
 export const maxDuration = 60;
 export const dynamic = "force-dynamic";
 
-type Reply = { ok: true; provider: "gemini"; model: string; attempts: number; extraction: unknown } | { ok: false; error: string };
+type Tried = { model: string; attempt: number; ok: boolean; error?: string };
+type Reply =
+  | { ok: true; provider: "gemini"; model: string; attempts: number; tried: Tried[]; extraction: unknown }
+  | { ok: false; error: string };
 
 const json = (body: Reply, status: number) =>
   new Response(JSON.stringify(body), { status, headers: { "content-type": "application/json", "cache-control": "no-store" } });
@@ -46,11 +49,13 @@ export async function POST(req: Request): Promise<Response> {
   try {
     const r = await extractWithGemini({
       apiKey,
-      model: process.env.GEMINI_MODEL?.trim(),
+      model: process.env.GEMINI_MODEL?.trim(), // preferred; falls back through GEMINI_VISION_MODELS
+      budgetMs: 50_000, // maxDuration is 60 s
       imageBase64: parsed.data.imageBase64,
       mediaType: parsed.data.mediaType,
     });
-    return json({ ok: true, provider: "gemini", model: r.model, attempts: r.attempts, extraction: r.extraction }, 200);
+    const tried = r.tried.map(({ model, attempt, ok, error }) => ({ model, attempt, ok, error }));
+    return json({ ok: true, provider: "gemini", model: r.model, attempts: r.attempts, tried, extraction: r.extraction }, 200);
   } catch (e) {
     const message = e instanceof ExtractorError ? e.message : "Unexpected error while transcribing the photo.";
     return json({ ok: false, error: message }, 502);

@@ -19,7 +19,7 @@ export function loadRootEnvForDev(): void {
   const file = path.resolve(process.cwd(), "../../.env.local");
   if (!existsSync(file)) return;
   for (const line of readFileSync(file, "utf8").split(/\r?\n/)) {
-    const m = /^\s*([A-Z0-9_]+)\s*=\s*(.*?)\s*$/.exec(line);
+    const m = /^\s*(?:export\s+)?([A-Z0-9_]+)\s*=\s*(.*?)\s*$/.exec(line);
     if (!m || !(NAMES as readonly string[]).includes(m[1]) || process.env[m[1]]) continue;
     const value = m[2].replace(/\s+#.*$/, "").replace(/^(['"])(.*)\1$/, "$2");
     if (value) process.env[m[1]] = value;

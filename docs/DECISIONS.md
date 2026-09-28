@@ -33,3 +33,9 @@ One entry per decision or new dependency: what, why, alternative rejected.
 - **What:** `examseal-ops` now depends on `viem@2.56.9` (same version as core and frontend) and `examseal-shared` (registry address and ABI; never hand-copied). `scripts/e2e-local.ts` tests seed against a local Hardhat node.
 - **Why:** §2 says ops scripts use tsx + viem. The local test exercises the full lifecycle (early release rejected, 2/5 locked, 3/5 authorizes, all centres decrypt from on-chain data, reveal) without spending testnet funds or creating testnet exams.
 - **Rejected:** hand-writing the ABI in ops (could drift from the deployed contract); testing seed on testnet (would burn exam ids and faucet funds).
+
+## D6: Gemini retries and model fallback (H3)
+
+- **What:** `extractWithGemini` retries 503/429/5xx up to 3 times per model (waits 1 s, 2 s; a longer server-requested wait skips to the next model), then falls back through the free stable vision models: `GEMINI_MODEL` first, then `gemini-3.8-flash`, `-3.7-flash`, `-3.6-flash`, `-3.5-flash`, `-3.1-flash-lite`, `-3.5-flash-lite`. A model not found or not allowed for the key is skipped. Invalid output still gets exactly one retry (§10); bad key / bad image stop at once. The route has a 50 s budget (maxDuration 60 s). Every error names the model.
+- **Why:** on 29 Sep both `gemini-3.5-flash` and `gemini-3.8-flash` returned `503 UNAVAILABLE: high demand` for minutes; the single immediate retry failed straight through. With fallback, `check-extractor` on a test photo succeeded on `gemini-3.7-flash` (8 calls, 33.6 s).
+- **Rejected:** the 2.5 series (Google now limits it to accounts that used it before); preview models (unstable); longer waits on one model (a demo can't sit for 30 s+ on a quota delay).

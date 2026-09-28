@@ -34,7 +34,7 @@ export default function TracePage() {
   );
 }
 
-type Transcription = { extraction: Extraction; model: string; attempts: number; createdAt: string };
+type Transcription = { extraction: Extraction; model: string; attempts: number; fallbacks: string[]; createdAt: string };
 
 function Trace() {
   const search = useSearchParams();
@@ -90,11 +90,25 @@ function Trace() {
         headers: { "content-type": "application/json" },
         body: JSON.stringify({ imageBase64: photo.base64, mediaType: "image/jpeg" }),
       });
-      const body = (await res.json().catch(() => null)) as { ok?: boolean; error?: string; extraction?: unknown; model?: string; attempts?: number } | null;
+      const body = (await res.json().catch(() => null)) as {
+        ok?: boolean;
+        error?: string;
+        extraction?: unknown;
+        model?: string;
+        attempts?: number;
+        tried?: { model: string; ok: boolean }[];
+      } | null;
       if (!res.ok || !body?.ok) throw new Error(body?.error ?? `The transcription service answered HTTP ${res.status}.`);
       const parsed = ExtractionSchema.safeParse(body.extraction);
       if (!parsed.success) throw new Error("The transcription came back in an unexpected shape.");
-      setTranscription({ extraction: parsed.data, model: body.model ?? "unknown", attempts: body.attempts ?? 1, createdAt: new Date().toISOString() });
+      const fallbacks = [...new Set((body.tried ?? []).filter((t) => !t.ok && t.model !== body.model).map((t) => t.model))];
+      setTranscription({
+        extraction: parsed.data,
+        model: body.model ?? "unknown",
+        attempts: body.attempts ?? 1,
+        fallbacks,
+        createdAt: new Date().toISOString(),
+      });
     } catch (e) {
       setExtractError((e as Error).message);
     } finally {
@@ -221,7 +235,11 @@ function Trace() {
             <summary>
               AI transcription (Gemini, {transcription.model}): {transcription.extraction.questions.length} question(s), legibility{" "}
               {transcription.extraction.legibility}
-              {transcription.attempts > 1 ? ` · succeeded on retry` : ""}
+              {transcription.fallbacks.length > 0
+                ? ` · after ${transcription.fallbacks.join(", ")} did not answer`
+                : transcription.attempts > 1
+                  ? ` · succeeded on attempt ${transcription.attempts}`
+                  : ""}
             </summary>
             <ol className="stack small" style={{ paddingLeft: "1.2rem" }}>
               {transcription.extraction.questions.map((q, i) => (
