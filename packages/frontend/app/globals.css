@@ -179,6 +179,21 @@ th { color: var(--ink-soft); font-weight: 600; }
 .fileloader:hover, .fileloader-drag { border-color: var(--blue); }
 .fileloader-loaded { flex-direction: row; justify-content: space-between; align-items: center; flex-wrap: wrap; border-style: solid; border-color: var(--green); cursor: default; }
 
+/* ---------- footer ---------- */
+.site-footer { border-top: 1px solid var(--line); background: var(--surface); padding: 1rem; margin-top: 2rem; }
+.site-footer-row { max-width: 1240px; margin: 0 auto; display: flex; flex-direction: column; gap: 0.5rem; }
+.footer-links { display: flex; flex-wrap: wrap; gap: 0.4rem 1.25rem; }
+.footer-links a { color: var(--ink); text-decoration: none; }
+.footer-links a:hover { text-decoration: underline; }
+
+/* ---------- terms / privacy ---------- */
+.prose { max-width: 780px; }
+.prose section { margin-top: 1.5rem; }
+.prose h2 { font-size: 1rem; }
+.prose p, .prose li { color: var(--ink); }
+.prose ul { padding-left: 1.2rem; margin: 0.4rem 0; }
+.prose li { margin: 0.35rem 0; }
+
 /* ---------- misc ---------- */
 .stat { font-size: 2.2rem; font-weight: 800; font-family: var(--mono); }
 .check-ok { color: var(--green); font-weight: 700; }
