@@ -8,7 +8,7 @@ import {
   renderVariantHtml,
   validateMasterPaper,
 } from "examseal-core";
-import { ROOT, UserError, readJson, rel, resolvePaperPath, secret32 } from "./env";
+import { ROOT, UserError, readJson, rel, resolvePaperPath, secret32, userPath } from "./env";
 
 export type RenderOpts = {
   centre: string;
@@ -65,7 +65,7 @@ export function render(opts: RenderOpts): number {
 
   const html = renderVariantHtml(buildVariant(master, code));
   const outDir = opts.out
-    ? path.resolve(process.cwd(), opts.out)
+    ? userPath(opts.out)
     : examDir
       ? path.join(examDir, "variants")
       : path.join(ROOT, "demo-data", "secrets", "render");

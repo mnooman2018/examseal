@@ -10,6 +10,8 @@ Commands:
       Check demo-data/master-paper.json against the §9 authoring rules.
   render --centre <id> [--exam <id>] [--centres 20] [--paper <path>] [--out <dir>] [--force]
       Write a printable HTML variant for one centre (for leak photos).
+  check-extractor <image-path>
+      Send one photo to the Gemini vision model with the §10 prompt and print the JSON.
 `;
 
 async function main(argv: string[]): Promise<number> {
@@ -32,6 +34,10 @@ async function main(argv: string[]): Promise<number> {
       return validatePaper(values);
     case "render":
       return render({ ...values, centre: values.centre ?? "" });
+    case "check-extractor": {
+      const { checkExtractor } = await import("./check-extractor");
+      return checkExtractor(positionals[0]);
+    }
     default:
       console.log(USAGE);
       return command ? 1 : 0;

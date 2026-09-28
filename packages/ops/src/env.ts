@@ -22,7 +22,7 @@ export const EXAMPLE_PAPER = path.join(ROOT, "demo-data", "master-paper.example.
 
 /** Resolve --paper, else the master paper, else the example (with a notice). */
 export function resolvePaperPath(arg: string | undefined): string {
-  if (arg) return path.resolve(process.cwd(), arg);
+  if (arg) return userPath(arg);
   if (existsSync(MASTER_PAPER)) return MASTER_PAPER;
   if (existsSync(EXAMPLE_PAPER)) {
     console.warn(`NOTE: ${rel(MASTER_PAPER)} does not exist yet; using ${rel(EXAMPLE_PAPER)}.`);
@@ -56,4 +56,9 @@ export function secret32(cliValue: string | undefined, envName: string): Uint8Ar
 
 export function rel(p: string): string {
   return path.relative(ROOT, p).replace(/\\/g, "/");
+}
+
+/** Resolve a path the user typed, relative to where they ran pnpm (pnpm sets INIT_CWD). */
+export function userPath(p: string): string {
+  return path.resolve(process.env.INIT_CWD ?? process.cwd(), p);
 }
