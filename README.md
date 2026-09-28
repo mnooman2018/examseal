@@ -4,6 +4,8 @@
 
 ExamSeal is a prototype system designed to help protect examination papers before their scheduled release and trace the source of a leaked paper.
 
+For digital examinations, ExamSeal can also create candidate-specific variants, allowing tracing down to an individual seat.
+
 Instead of distributing one identical exam paper to every centre, ExamSeal can create distinguishable centre-specific versions. If a photograph of a paper is leaked, the system can extract the visible questions and compare them against the generated variants to determine the likely source.
 
 ## The Problem
@@ -39,7 +41,17 @@ The master examination can be rendered into distinguishable variants for differe
 
 The current testnet demo contains **20 centres**.
 
-### 4. Leak analysis
+### 4. Digital candidate-level tracing
+
+ExamSeal also supports JEE-style digital examinations through a separate digital flow.
+
+Instead of assigning only a centre-specific paper, each candidate seat can receive its own distinguishable copy. This allows a leaked digital paper to be traced at a finer level, such as **Centre 14, Seat 7**.
+
+According to the project's simulation tests, centre-level tracing produced no incorrect centre identifications across 6,000 simulated leaks. For seat-level tracing, a half-paper leak identified the exact seat about 4 times in 5 without naming an incorrect seat, while a full-paper leak identified the exact seat in 999 out of 1,000 simulations.
+
+These figures are simulation results and should not be interpreted as real-world deployment accuracy.
+
+### 5. Leak analysis
 
 A suspected leak can be submitted as a photograph.
 
