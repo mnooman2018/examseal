@@ -11,7 +11,8 @@ import {
 import { ROOT, UserError, readJson, rel, resolvePaperPath, secret32, userPath } from "./env";
 
 export type RenderOpts = {
-  centre: string;
+  centre?: string;
+  master?: boolean;
   exam?: string;
   centres?: string;
   paper?: string;
@@ -20,17 +21,31 @@ export type RenderOpts = {
   force?: boolean;
 };
 
+/** Master order: Q01..Q12 as authored, options A–D as authored, first wording (§12 fake leak). */
+export function masterOrderCode(master: MasterPaper): CentreCode {
+  const code: CentreCode = { centreId: 0, order: master.questions.map((q) => q.id), optionPerms: {}, wordings: {} };
+  for (const q of master.questions) {
+    code.optionPerms[q.id] = [0, 1, 2, 3];
+    code.wordings[q.id] = 0;
+  }
+  return code;
+}
+
 /**
  * pnpm ops render --centre 14 [--exam <id>] [--centres 20] [--paper <path>] [--out <dir>] [--force]
+ * pnpm ops render --master [--paper <path>] [--out <dir>]
  *
  * With --exam, uses that exam's codebook.secret.json if seed has written it. Otherwise
  * regenerates the demo codebook from DEMO_CODEBOOK_SEED for centres 1..N (the same one
  * `ops seed` uses), so Dhruva can print a variant before any exam exists.
+ * --master prints the paper unshuffled, for the fake-leak photo (must trace INCONCLUSIVE).
  * Output goes under demo-data/secrets/ (gitignored) unless --out is given.
  */
 export function render(opts: RenderOpts): number {
   const centreId = Number(opts.centre);
-  if (!Number.isInteger(centreId) || centreId < 0) throw new UserError("--centre <id> is required (e.g. --centre 14)");
+  if (!opts.master && (!opts.centre || !Number.isInteger(centreId) || centreId < 0)) {
+    throw new UserError("--centre <id> is required (e.g. --centre 14), or pass --master");
+  }
 
   const paperFile = resolvePaperPath(opts.paper);
   const raw = readJson(paperFile);
@@ -45,9 +60,12 @@ export function render(opts: RenderOpts): number {
 
   let code: CentreCode | undefined;
   let source: string;
-  const examDir = opts.exam ? path.join(ROOT, "demo-data", "secrets", `exam-${opts.exam}`) : undefined;
+  const examDir = opts.exam && !opts.master ? path.join(ROOT, "demo-data", "secrets", `exam-${opts.exam}`) : undefined;
   const examCodebook = examDir ? path.join(examDir, "codebook.secret.json") : undefined;
-  if (examCodebook && existsSync(examCodebook)) {
+  if (opts.master) {
+    code = masterOrderCode(master);
+    source = "master order, first wording, no shuffling";
+  } else if (examCodebook && existsSync(examCodebook)) {
     const book = readJson(examCodebook) as { centres?: CentreCode[] };
     code = book.centres?.find((c) => c.centreId === centreId);
     if (!code) throw new UserError(`Centre ${centreId} is not in exam ${opts.exam}'s codebook`);
@@ -70,9 +88,9 @@ export function render(opts: RenderOpts): number {
       ? path.join(examDir, "variants")
       : path.join(ROOT, "demo-data", "secrets", "render");
   mkdirSync(outDir, { recursive: true });
-  const outFile = path.join(outDir, `centre-${centreId}.html`);
+  const outFile = path.join(outDir, opts.master ? "master-order.html" : `centre-${centreId}.html`);
   writeFileSync(outFile, html);
-  console.log(`Wrote centre ${centreId}'s printable paper (${source}) to:`);
+  console.log(`Wrote ${opts.master ? "the master-order" : `centre ${centreId}'s`} printable paper (${source}) to:`);
   console.log(`  ${outFile}`);
   console.log("Open it in a browser and print (A4). It shows no centre number.");
   return 0;
