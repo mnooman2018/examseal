@@ -13,7 +13,12 @@ import {
   QUESTION_MIN_MARGIN,
   QUESTION_MIN_SIMILARITY,
   WORDING_MIN_GAP,
+  type CandidateCode,
+  SEAT_MIN_LEAD,
   decide,
+  decideWithCandidates,
+  deriveCandidateSeed,
+  generateCandidates,
   generateCodebook,
   identifyQuestions,
   scoreCentres,
@@ -29,6 +34,7 @@ export type SimulateOpts = { trials?: number; seed?: string; codebooks?: number;
 
 const KS = [2, 3, 4, 6, 8, 12] as const; // §10
 const CENTRES = 20;
+const SEATS = 30; // D9
 const NOISE = { typo: 0.05, dropOption: 0.2, dropNumber: 0.3 }; // §10
 
 const sha = (s: string) => new Uint8Array(createHash("sha256").update(s).digest());
@@ -179,6 +185,47 @@ export function simulate(opts: SimulateOpts): number {
   const totalRealTrials = [...real.values()].reduce((s, t) => s + t.trials, 0);
   const totalFakeMatch = [...fake.values()].reduce((s, t) => s + t.correct + t.wrong, 0) + mo.correct + mo.wrong;
   const totalFakeTrials = [...fake.values()].reduce((s, t) => s + t.trials, 0) + mo.trials;
+
+  // D9: digital leaks traced to a seat. Seat seeds come from the public simulation seed.
+  console.log(`Generating ${SEATS} seats per centre for each exam codebook…`);
+  const seatList = Array.from({ length: SEATS }, (_, i) => i + 1);
+  const cands: CandidateCode[][] = books.map((b, bi) =>
+    b.flatMap((c) => generateCandidates(master, c, deriveCandidateSeed(sha(`${seed}/centre-key/${bi}/${c.centreId}`)), seatList)),
+  );
+  type SeatTally = { trials: number; rightSeat: number; centreOnly: number; inconclusive: number; wrongCentre: number; wrongSeat: number };
+  const seatT = new Map<number, SeatTally>();
+  const printedSeat = new Map<number, { trials: number; seatNamed: number; rightCentre: number; wrongCentre: number }>();
+  for (const k of KS) {
+    const rand = prng(`${seed}/seat/k=${k}`);
+    const st: SeatTally = { trials: 0, rightSeat: 0, centreOnly: 0, inconclusive: 0, wrongCentre: 0, wrongSeat: 0 };
+    const pt = { trials: 0, seatNamed: 0, rightCentre: 0, wrongCentre: 0 };
+    for (let t = 0; t < trials; t++) {
+      const bi = t % nBooks;
+      const cand = cands[bi][Math.floor(rand() * cands[bi].length)];
+      const x = addNoise(syntheticExtraction(master, cand, pick(rand, n, k)), rand);
+      const r = decideWithCandidates(identifyQuestions(x, master), books[bi], cands[bi]);
+      st.trials++;
+      if (r.decision.kind !== "MATCH") st.inconclusive++;
+      else if (r.decision.centreId !== cand.centreId) st.wrongCentre++;
+      else if (!r.seat) st.centreOnly++;
+      else if (r.seat.seat === cand.seat) st.rightSeat++;
+      else st.wrongSeat++;
+      // A printed (centre) paper traced with the seat file loaded must never be given a seat.
+      const code = books[bi][Math.floor(rand() * books[bi].length)];
+      const px = addNoise(syntheticExtraction(master, code, pick(rand, n, k)), rand);
+      const pr = decideWithCandidates(identifyQuestions(px, master), books[bi], cands[bi]);
+      pt.trials++;
+      if (pr.seat) pt.seatNamed++;
+      if (pr.decision.kind === "MATCH") pr.decision.centreId === code.centreId ? pt.rightCentre++ : pt.wrongCentre++;
+    }
+    seatT.set(k, st);
+    printedSeat.set(k, pt);
+    console.log(`  seat k=${String(k).padStart(2)}: right seat ${st.rightSeat}, centre only ${st.centreOnly}, wrong centre ${st.wrongCentre}, wrong seat ${st.wrongSeat} · printed given a seat ${pt.seatNamed}`);
+  }
+  const totalWrongSeat = [...seatT.values()].reduce((s, t) => s + t.wrongSeat + t.wrongCentre, 0);
+  const totalSeatTrials = [...seatT.values()].reduce((s, t) => s + t.trials, 0);
+  const totalPrintedSeat = [...printedSeat.values()].reduce((s, t) => s + t.seatNamed + t.wrongCentre, 0);
+  const totalPrintedTrials = [...printedSeat.values()].reduce((s, t) => s + t.trials, 0);
   const secs = ((Date.now() - started) / 1000).toFixed(1);
   for (const m of falseMatches) {
     console.log(`  FALSE MATCH ${m.row} trial ${m.trial}: ${m.source} → centre ${m.centre}, ${m.matched}/${m.observed}, runner-up ${m.runnerUpMatched}`);
@@ -203,6 +250,8 @@ export function simulate(opts: SimulateOpts): number {
   lines.push(`|---|---|---|`);
   lines.push(`| Real leaks attributed to the wrong centre (MATCH-wrong) = 0 | ${totalRealWrong} of ${totalRealTrials} | ${totalRealWrong === 0 ? "yes" : "**NO**"} |`);
   lines.push(`| Fake leaks attributed to any centre (false match) = 0 | ${totalFakeMatch} of ${totalFakeTrials} | ${totalFakeMatch === 0 ? "yes" : "**NO**"} |`);
+  lines.push(`| Digital leaks attributed to the wrong seat or wrong centre = 0 (D9) | ${totalWrongSeat} of ${totalSeatTrials} | ${totalWrongSeat === 0 ? "yes" : "**NO**"} |`);
+  lines.push(`| Printed leaks given a seat, or the wrong centre, with the seat file loaded = 0 (D9) | ${totalPrintedSeat} of ${totalPrintedTrials} | ${totalPrintedSeat === 0 ? "yes" : "**NO**"} |`);
   lines.push("");
   lines.push("## Real leaks with noise");
   lines.push("");
@@ -248,6 +297,26 @@ export function simulate(opts: SimulateOpts): number {
     }
     lines.push("");
   }
+  lines.push("## Digital leaks: seat-level tracing (D9)");
+  lines.push("");
+  lines.push(`A random seat's copy (${SEATS} seats per centre; each seat's copy differs from its centre's printed copy in 8 features), k random questions visible, the same noise as above. Traced with the codebook and the seat file: centre first, then seat (seat lead ≥ ${SEAT_MIN_LEAD}). ${trials} trials per row.`);
+  lines.push("");
+  lines.push("| Visible questions (k) | Right centre and right seat | Right centre, seat not determined | INCONCLUSIVE | Wrong centre | Wrong seat |");
+  lines.push("|---|---|---|---|---|---|");
+  for (const k of KS) {
+    const t = seatT.get(k)!;
+    lines.push(`| ${k} | ${t.rightSeat} (${pct(t.rightSeat, t.trials)}) | ${t.centreOnly} (${pct(t.centreOnly, t.trials)}) | ${t.inconclusive} (${pct(t.inconclusive, t.trials)}) | ${t.wrongCentre} | ${t.wrongSeat} |`);
+  }
+  lines.push("");
+  lines.push("Printed (centre) papers traced with the seat file loaded, same trials per row: a seat must never be named.");
+  lines.push("");
+  lines.push("| Visible questions (k) | Seat named (must be 0) | Right centre | Wrong centre |");
+  lines.push("|---|---|---|---|");
+  for (const k of KS) {
+    const t = printedSeat.get(k)!;
+    lines.push(`| ${k} | ${t.seatNamed} | ${t.rightCentre} (${pct(t.rightCentre, t.trials)}) | ${t.wrongCentre} |`);
+  }
+  lines.push("");
   lines.push("## What this does and does not show");
   lines.push("");
   lines.push("- It measures the deterministic matcher on synthetic transcriptions with the §10 noise model. It does not measure the vision model: real photos are tested separately (`docs/QA.md`, §12 photos 1–7).");
@@ -259,5 +328,6 @@ export function simulate(opts: SimulateOpts): number {
   writeFileSync(out, lines.join("\n"));
   console.log(`\nMATCH-wrong: ${totalRealWrong} of ${totalRealTrials} · fake false matches: ${totalFakeMatch} of ${totalFakeTrials} · ${secs} s`);
   console.log(`Wrote ${rel(out)}`);
-  return totalRealWrong === 0 && totalFakeMatch === 0 ? 0 : 2;
+  console.log(`seat level: wrong seat or centre ${totalWrongSeat} of ${totalSeatTrials} · printed given a seat or wrong centre ${totalPrintedSeat} of ${totalPrintedTrials}`);
+  return totalRealWrong === 0 && totalFakeMatch === 0 && totalWrongSeat === 0 && totalPrintedSeat === 0 ? 0 : 2;
 }

@@ -5,10 +5,14 @@ import {
   type CandidateCode,
   MIN_SEAT_DISTANCE,
   SEAT_CHANGES,
+  applySeatOps,
   deriveCandidateSeed,
   featureDistance,
   generateCandidates,
+  generateSeatOps,
+  seatCode,
 } from "../src/candidate";
+import { buildVariant } from "../src/variant";
 import { type CentreCode, generateCodebook } from "../src/codebook";
 import { identifyQuestions } from "../src/forensic/identify";
 import { decideWithCandidates } from "../src/forensic/seat";
@@ -81,6 +85,17 @@ describe.each(papers)("seat layer on the %s", (_name, master) => {
       for (const s of seats) expect(featureDistance(s, centre)).toBe(SEAT_CHANGES);
       for (let i = 0; i < seats.length; i++) {
         for (let j = i + 1; j < seats.length; j++) expect(featureDistance(seats[i], seats[j])).toBeGreaterThanOrEqual(MIN_SEAT_DISTANCE);
+      }
+    }
+  });
+
+  it("the centre renders exactly the paper the authority traces against (applySeatOps = buildVariant(seatCode))", () => {
+    for (let i = 0; i < book.length; i++) {
+      const seed = deriveCandidateSeed(keys[i].privateKey);
+      const centreVariant = buildVariant(master, book[i]); // what the centre decrypts
+      // The centre knows only the question count and its seed; the authority knows the centre code too.
+      for (const ops of generateSeatOps(master.questions.length, seed, seats30)) {
+        expect(applySeatOps(centreVariant, ops)).toEqual(buildVariant(master, seatCode(book[i], ops)));
       }
     }
   });

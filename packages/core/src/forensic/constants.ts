@@ -34,7 +34,7 @@ export const LEAD_FRACTION_PERCENT = 30;
 
 /**
  * Seat attribution (D9): the best seat must lead both the next seat and the centre's printed copy by
- * at least this many features. Initial value; `ops simulate` measures seat attribution and D9 records
- * the value it justifies.
+ * at least this many features. Justified by `ops simulate` seeds v1–v5 (D9): 0 wrong seats or centres in
+ * 30,000 digital leaks and 0 printed papers given a seat in 30,000.
  */
 export const SEAT_MIN_LEAD = 2;
