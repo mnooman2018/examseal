@@ -46,4 +46,4 @@ Owner: Sampurna. Updated at every gate.
 - G0 and G1 done (Nooman): Hello deployed; ExamSealRegistry deployed and verified; 29 contract tests green. nooman/contract merged to main.
 - G2 done: core round trip, 2 pieces fail, and TypeScript fingerprint commitment equals the contract fixture.
 - Master paper moved from dhruva/exam.json to demo-data/master-paper.json; validate-paper OK (12 questions).
-- G3 done on exam 3: seed, rejected early release, custodian releases, Centre 14 decrypted, a photo of Centre 14's printout traced to Centre 14 (36 of 36 features, locally), then Adithi recorded the evidence and revoked Centre 14 from the live site. Tx links are on `/exam/3` and in `docs/QA.md`.
+- G3 done on exam 3: seed, rejected early release, custodian releases, Centre 14 decrypted, a photo of Centre 14's printout traced to Centre 14 (36 of 36 features, locally), then Adithi recorded the evidence and revoked Centre 14 from the live site. Tx links are on the `/exam/3` chain-of-custody timeline.
