@@ -11,7 +11,7 @@ Owner: Sampurna. Updated at every gate.
 | G0 | H1 | 22:43 (28 Sep) | A real testnet transaction from our repo; BridgeKey signing on localhost | **Done** (Nooman) |
 | G1 | H4 | 01:43 (29 Sep) | `ExamSealRegistry` deployed and verified on testnet; all contract tests green | **Done** (merged to main 39d459c) |
 | G2 | H4–H5 | 01:43–02:43 | Core round trip (encrypt → split → seal → open any 3 → decrypt); 2 pieces fail; TS commitments equal Solidity | **Done** (65 core tests incl. Solidity cross-check) |
-| G3 | H10 | 07:43 | MVP end to end on testnet (seed → rejected early release → 3 releases → decrypt → trace → evidence → revoke). If this slips past H12 (09:43), apply the cut list | Pending |
+| G3 | H10 | 07:43 | MVP end to end on testnet (seed → rejected early release → 3 releases → decrypt → trace → evidence → revoke). If this slips past H12 (09:43), apply the cut list | **Done** (exam 3, Centre 14; see log) |
 | G4 | H14 | 11:43 | Public link works on a phone; attack checklist passes. **Feature freeze** | Pending |
 | G5 | H20 | 17:43 | Video recorded, README complete. **Code freeze**, tag `v1.0` | Pending |
 | G6 | H22 | 19:43 | Submission form sent, reel posted | Pending |
@@ -46,3 +46,4 @@ Owner: Sampurna. Updated at every gate.
 - G0 and G1 done (Nooman): Hello deployed; ExamSealRegistry deployed and verified; 29 contract tests green. nooman/contract merged to main.
 - G2 done: core round trip, 2 pieces fail, and TypeScript fingerprint commitment equals the contract fixture.
 - Master paper moved from dhruva/exam.json to demo-data/master-paper.json; validate-paper OK (12 questions).
+- G3 done on exam 3: seed, rejected early release, custodian releases, Centre 14 decrypted, a photo of Centre 14's printout traced to Centre 14 (36 of 36 features, locally), then Adithi recorded the evidence and revoked Centre 14 from the live site. Tx links are on `/exam/3` and in `docs/QA.md`.
