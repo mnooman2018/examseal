@@ -1,8 +1,13 @@
+import dns from "node:dns";
 import { existsSync, readFileSync } from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import dotenv from "dotenv";
 import { type Hex, fromHexBytes } from "examseal-core";
+
+// Prefer IPv4 for every outbound request (RPC, Gemini, Groq, MSTScan). On the team laptop Node's
+// fetch hit "read ECONNRESET" over IPv6 while curl worked; ipv4first fixed it (29 Sep, G4 checks).
+dns.setDefaultResultOrder("ipv4first");
 
 /** Repo root (the directory holding pnpm-workspace.yaml). */
 export const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "../../..");
