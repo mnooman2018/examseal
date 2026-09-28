@@ -60,9 +60,9 @@ No successful share release occurred before the scheduled release time.
 | Sealed pieces read from chain | PASS | 5 sealed pieces on-chain |
 | Encrypted copy fetched | PASS | Ciphertext fetched from block 5787003 |
 | Variant commitment verification | PASS | Commitment matched |
-| Centre 14 browser decryption | BLOCKED | Decryption module not merged into deployed build |
+| Centre 14 browser decryption | PASS | Centre 14 paper successfully decrypted in browser after the decryption module was deployed |
 
-### Exam 3 Centre 14 Decryption Blocker
+### Exam 3 Centre 14 Decryption Verification
 
 The Centre 14 page successfully reached the release, sealed-piece, ciphertext, and commitment verification stages.
 
@@ -72,11 +72,9 @@ Observed release state:
 - Approvals: 5/5
 - Centre status: RELEASED
 - Sealed pieces on-chain: 5
+- Variant commitment: MATCHED
+- Browser decryption: SUCCESSFUL
 
-The deployed build then displayed:
+The Centre 14 paper was successfully decrypted in the browser after the decryption module was deployed.
 
-`Waiting on examseal-core (Sampurna): the decryption module is not merged into this build yet.`
-
-Therefore the Centre 14 paper could not be decrypted in the deployed build at the time of testing.
-
-Status: BLOCKED
+Status: PASS
