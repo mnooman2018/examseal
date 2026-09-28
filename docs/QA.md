@@ -19,7 +19,7 @@
 | 10 | Leak photo 5 | Identified as Centre 14 | NOT TESTED | |
 | 11 | Leak photo 6 | Identified as Centre 14 | NOT TESTED | |
 | 12 | Fake leak photo 7 | INCONCLUSIVE | NOT TESTED | |
-| 13 | Refresh during flow | State recovers from blockchain | NOT TESTED | |
+| 13 | Refresh during flow | State recovers from blockchain | PASS | Refreshed Centre 14 page, reloaded the key file, and the 5/5 RELEASED blockchain state recovered successfully |
 | 14 | Phone view | Usable | PASS | Tested on iPhone |
 | 15 | Projector view | Readable | NOT TESTED | |
 | 16 | Explorer links | Each link opens the correct MSTScan transaction | NOT TESTED | |
