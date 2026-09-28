@@ -1,4 +1,4 @@
-import type { Phase } from "@/hooks/useExam";
+import type { Phase, PhaseDisplay } from "@/hooks/useExam";
 
 const PHASES: Phase[] = ["Sealed", "Awaiting release", "Released", "Compromised"];
 const TONE: Record<Phase, string> = {
@@ -8,8 +8,11 @@ const TONE: Record<Phase, string> = {
   Compromised: "bad",
 };
 
-/** Sealed → Awaiting release → Released → Compromised, with the current phase lit. */
-export function PhaseStrip({ phase }: { phase: Phase }) {
+/**
+ * Sealed → Awaiting release → Released → Compromised, with the current phase lit.
+ * `display` sets the text of the current phase step (see phaseDisplay in hooks/useExam).
+ */
+export function PhaseStrip({ phase, display }: { phase: Phase; display?: PhaseDisplay }) {
   const current = PHASES.indexOf(phase);
   return (
     <ol className="phase-strip" aria-label="Exam phase">
@@ -19,7 +22,8 @@ export function PhaseStrip({ phase }: { phase: Phase }) {
           className={`phase phase-${TONE[p]} ${i === current ? "phase-current" : ""} ${i < current ? "phase-past" : ""}`}
           aria-current={i === current ? "step" : undefined}
         >
-          {p.toUpperCase()}
+          <span>{(i === current && display ? display.label : p).toUpperCase()}</span>
+          {i === current && display?.detail && <span className="phase-detail">{display.detail}</span>}
         </li>
       ))}
     </ol>

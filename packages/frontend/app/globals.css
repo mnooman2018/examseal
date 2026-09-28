@@ -140,8 +140,9 @@ th { color: var(--ink-soft); font-weight: 600; }
 
 /* ---------- phase strip ---------- */
 .phase-strip { list-style: none; padding: 0; margin: 0.75rem 0; display: grid; grid-template-columns: repeat(4, 1fr); gap: 0.35rem; }
-.phase { padding: 0.55rem 0.5rem; text-align: center; font-weight: 700; font-size: 0.85rem; letter-spacing: 0.08em; border: 1px solid var(--line); color: var(--ink-soft); background: var(--surface); }
+.phase { display: flex; flex-direction: column; gap: 0.15rem; align-items: center; justify-content: center; padding: 0.55rem 0.5rem; text-align: center; font-weight: 700; font-size: 0.85rem; letter-spacing: 0.08em; border: 1px solid var(--line); color: var(--ink-soft); background: var(--surface); }
 .phase-past { color: var(--ink); }
+.phase-detail { font-size: 0.75rem; font-weight: 600; letter-spacing: 0.02em; opacity: 0.9; }
 .phase-current.phase-neutral { border-color: var(--ink-soft); color: var(--ink); background: var(--surface-2); }
 .phase-current.phase-pending { border-color: var(--amber); color: var(--amber); background: rgba(240, 168, 48, 0.08); }
 .phase-current.phase-ok { border-color: var(--green); color: var(--green); background: rgba(63, 191, 111, 0.08); }
