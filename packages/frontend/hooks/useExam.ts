@@ -5,6 +5,7 @@ import type { Address, Hex } from "viem";
 import { publicClient } from "@/lib/client";
 import { registry, POLL_MS, CENTRE_STATUS, type CentreStatusName } from "@/lib/registry";
 import { decodeRevert } from "@/lib/errors";
+import { centreLabel } from "@/lib/format";
 
 export type Exam = {
   id: bigint;
@@ -116,6 +117,7 @@ export type PhaseDisplay = { label: string; detail?: string };
  * Text for the current phase step:
  * - Awaiting release (release open, no centre at threshold yet) → "Release open, awaiting custodians"
  * - Released while some non-compromised centres are still below threshold → count line, e.g. "3 of 20 centres released"
+ * - Compromised → which centres were revoked, e.g. "Centre 14 revoked" or "2 centres revoked" (only those centres are affected)
  */
 export function phaseDisplay(phase: Phase, centres: Centre[]): PhaseDisplay {
   if (phase === "Awaiting release") return { label: "Release open, awaiting custodians" };
@@ -123,6 +125,11 @@ export function phaseDisplay(phase: Phase, centres: Centre[]): PhaseDisplay {
     const released = centres.filter((c) => c.status === "Released").length;
     const eligible = centres.filter((c) => c.status !== "Compromised").length;
     return released < eligible ? { label: phase, detail: `${released} of ${eligible} centres released` } : { label: phase };
+  }
+  if (phase === "Compromised") {
+    const revoked = centres.filter((c) => c.status === "Compromised");
+    const detail = revoked.length === 1 ? `${centreLabel(revoked[0].id)} revoked` : `${revoked.length} centres revoked`;
+    return { label: phase, detail };
   }
   return { label: phase };
 }
