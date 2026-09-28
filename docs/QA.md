@@ -22,7 +22,7 @@
 | 13 | Refresh during flow | State recovers from blockchain | PASS | Refreshed Centre 14 page, reloaded the key file, and the 5/5 RELEASED blockchain state recovered successfully |
 | 14 | Phone view | Usable | PASS | Tested on iPhone |
 | 15 | Projector view | Readable | NOT TESTED | |
-| 16 | Explorer links | Each link opens the correct MSTScan transaction | NOT TESTED | |
+| 16 | Explorer links | Each link opens the correct MSTScan transaction | PASS | Verified the transaction links in the Exam 3 chain-of-custody timeline; all visible transactions opened correctly on MSTScan |
 | 17 | Three custodians released | 3/5 reached; RELEASE AUTHORIZED | NOT TESTED | |
 | 18 | Centre 14 unlock | Commitment verified; paper successfully unlocked | NOT TESTED | |
 | 19 | Record leak evidence | Evidence recorded successfully; transaction visible on MSTScan | NOT TESTED | |
