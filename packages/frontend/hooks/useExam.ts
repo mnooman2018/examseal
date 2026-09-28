@@ -108,3 +108,14 @@ export function examPhase(exam: Exam, centres: Centre[], now: number | undefined
   if (now !== undefined && now >= exam.releaseTime) return "Awaiting release";
   return "Sealed";
 }
+
+/**
+ * Display label for the current phase. Once release is open but no centre has reached the
+ * threshold yet, "Awaiting release" reads as "Release open, awaiting custodians".
+ */
+export function phaseLabel(phase: Phase, exam: Exam, centres: Centre[]): string {
+  if (phase === "Awaiting release" && !centres.some((c) => c.approvals >= exam.threshold)) {
+    return "Release open, awaiting custodians";
+  }
+  return phase;
+}
