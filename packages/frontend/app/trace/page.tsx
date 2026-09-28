@@ -34,7 +34,8 @@ export default function TracePage() {
   );
 }
 
-type Transcription = { extraction: Extraction; model: string; attempts: number; fallbacks: string[]; createdAt: string };
+type Transcription = { extraction: Extraction; provider: string; model: string; attempts: number; fallbacks: string[]; createdAt: string };
+const PROVIDER_LABEL: Record<string, string> = { gemini: "Gemini", groq: "Groq" };
 
 function Trace() {
   const search = useSearchParams();
@@ -96,14 +97,18 @@ function Trace() {
         extraction?: unknown;
         model?: string;
         attempts?: number;
-        tried?: { model: string; ok: boolean }[];
+        provider?: string;
+        tried?: { provider: string; model: string; ok: boolean }[];
       } | null;
       if (!res.ok || !body?.ok) throw new Error(body?.error ?? `The transcription service answered HTTP ${res.status}.`);
       const parsed = ExtractionSchema.safeParse(body.extraction);
       if (!parsed.success) throw new Error("The transcription came back in an unexpected shape.");
-      const fallbacks = [...new Set((body.tried ?? []).filter((t) => !t.ok && t.model !== body.model).map((t) => t.model))];
+      const fallbacks = [
+        ...new Set((body.tried ?? []).filter((t) => !t.ok && t.model !== body.model).map((t) => `${PROVIDER_LABEL[t.provider] ?? t.provider} ${t.model}`)),
+      ];
       setTranscription({
         extraction: parsed.data,
+        provider: PROVIDER_LABEL[body.provider ?? ""] ?? body.provider ?? "unknown",
         model: body.model ?? "unknown",
         attempts: body.attempts ?? 1,
         fallbacks,
@@ -233,7 +238,7 @@ function Trace() {
         {transcription && (
           <details>
             <summary>
-              AI transcription (Gemini, {transcription.model}): {transcription.extraction.questions.length} question(s), legibility{" "}
+              AI transcription ({transcription.provider}, {transcription.model}): {transcription.extraction.questions.length} question(s), legibility{" "}
               {transcription.extraction.legibility}
               {transcription.fallbacks.length > 0
                 ? ` · after ${transcription.fallbacks.join(", ")} did not answer`

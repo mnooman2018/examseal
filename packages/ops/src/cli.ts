@@ -12,8 +12,9 @@ Commands:
       Write a printable HTML variant for one centre (for leak photos).
   render --master [--paper <path>] [--out <dir>]
       Write the paper in master order, unshuffled (for the fake-leak photo).
-  check-extractor <image-path>
-      Send one photo to the Gemini vision model with the §10 prompt and print the JSON.
+  check-extractor <image-path> [--provider auto|gemini|groq]
+      Send one photo with the §10 prompt and print the JSON. auto = Gemini with model
+      fallback, then Groq as a last resort if GROQ_API_KEY is set.
   seed [--centres 20] [--release-in 150] [--reveal-after 120] [--dry-run]
       Create a demo exam on MST Testnet (§12) and write its secret files to
       demo-data/secrets/exam-<id>/. --dry-run checks everything and sends nothing.
@@ -36,6 +37,7 @@ async function main(argv: string[]): Promise<number> {
       out: { type: "string" },
       force: { type: "boolean" },
       master: { type: "boolean" },
+      provider: { type: "string" },
       "release-in": { type: "string" },
       "reveal-after": { type: "string" },
       "dry-run": { type: "boolean" },
@@ -54,7 +56,7 @@ async function main(argv: string[]): Promise<number> {
       return render(values);
     case "check-extractor": {
       const { checkExtractor } = await import("./check-extractor");
-      return checkExtractor(positionals[0]);
+      return checkExtractor(positionals[0], { provider: values.provider });
     }
     case "seed": {
       const { seed, configFromEnv } = await import("./seed");

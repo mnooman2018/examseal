@@ -1,13 +1,13 @@
 import { existsSync, readFileSync } from "node:fs";
 import path from "node:path";
 
-const NAMES = ["GEMINI_API_KEY", "GEMINI_MODEL", "EXTRACTOR_PROVIDER"] as const;
+const NAMES = ["GEMINI_API_KEY", "GEMINI_MODEL", "GROQ_API_KEY", "GROQ_MODEL", "EXTRACTOR_PROVIDER"] as const;
 let done = false;
 
 /**
  * Local development only. Next.js reads .env.local from packages/frontend, but the team keeps
  * secrets in the repo-root .env.local (CLAUDE.md §12). When running `pnpm dev` and these names
- * are not already set, copy just these three from the root file into process.env.
+ * are not already set, copy just these names from the root file into process.env.
  * On Vercel (process.env.VERCEL) nothing is read; values come from the project settings.
  * Values are never logged.
  */

@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { EXTRACTION_SYSTEM_PROMPT, ExtractRequestSchema } from "../src/forensic/extraction";
-import { DEFAULT_GEMINI_MODEL, ExtractorError, GEMINI_VISION_MODELS, extractWithGemini } from "../src/forensic/gemini";
+import { ExtractorError } from "../src/forensic/extractor";
+import { DEFAULT_GEMINI_MODEL, GEMINI_VISION_MODELS, extractWithGemini } from "../src/forensic/gemini";
 
 const GOOD = '{"questions":[{"printedNumber":1,"text":"Which gate?","options":[{"label":"A","text":"AND"}]}],"legibility":"good"}';
 const KEY = "test-key-not-real";
@@ -97,7 +98,7 @@ describe("extractWithGemini (§10 + fallback)", () => {
     const f = fake(() => busy503);
     const err = await f.run({ budgetMs: 10 * 60_000 }).catch((e) => e);
     expect(err).toBeInstanceOf(ExtractorError);
-    expect(err.message).toMatch(/Every Gemini model is busy/);
+    expect(err.message).toMatch(/Every vision model is busy/);
     for (const m of GEMINI_VISION_MODELS) expect(err.message).toContain(`${m} (503 UNAVAILABLE ×3)`);
     expect(f.calls).toHaveLength(GEMINI_VISION_MODELS.length * 3);
   });
@@ -112,7 +113,7 @@ describe("extractWithGemini (§10 + fallback)", () => {
     const ok = fake((_m, n) => (n === 1 ? reply("Sure! Here is the JSON") : reply(GOOD)));
     expect((await ok.run()).attempts).toBe(2);
     const bad = fake(() => reply('{"questions":[]}'));
-    await expect(bad.run()).rejects.toThrow(/did not return a valid transcription after one retry \(gemini-3\.8-flash/);
+    await expect(bad.run()).rejects.toThrow(/did not return a valid transcription after one retry \(Gemini gemini-3\.8-flash/);
     expect(bad.calls).toHaveLength(2);
   });
 
