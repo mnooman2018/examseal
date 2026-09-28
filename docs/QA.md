@@ -79,7 +79,8 @@ The Centre 14 paper was successfully decrypted in the browser after the decrypti
 
 Status: PASS
 
-## QA Status Notes
+
+- ## QA Status Notes
 
 - Phone view: **PASS** — tested on iPhone.
-- Projector view: **NOT TESTED** — this is the remaining display check.
+- Projector view: **NOT TESTED** — no physical projector was available for testing.
