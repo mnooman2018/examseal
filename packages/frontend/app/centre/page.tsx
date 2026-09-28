@@ -15,6 +15,7 @@ import { FileLoader } from "@/components/FileLoader";
 import { ErrorBanner, WarningBanner } from "@/components/ErrorBanner";
 import { HashDisplay } from "@/components/HashDisplay";
 import { StatusPill } from "@/components/StatusPill";
+import { ApprovalBar } from "@/components/ApprovalBar";
 import { BlockLink } from "@/components/TxLink";
 
 export default function CentrePage() {
@@ -169,10 +170,8 @@ function CentreStatusPanel({ file, exam, centre }: { file: CentreKeyFile; exam: 
             {keyMatches ? <span className="check-ok">✓ matches your key file</span> : <span className="check-bad">✗ does not match your key file</span>}
           </div>
         </div>
-        <div className="tile-bar" style={{ marginTop: "0.75rem", maxWidth: "24rem" }}>
-          {Array.from({ length: n }, (_, i) => (
-            <span key={i} className={`seg ${i < centre.approvals ? "seg-on" : ""} ${i === exam.threshold - 1 ? "seg-threshold" : ""}`} />
-          ))}
+        <div style={{ marginTop: "0.75rem", maxWidth: "24rem" }}>
+          <ApprovalBar centre={centre} total={n} threshold={exam.threshold} />
         </div>
       </section>
 
