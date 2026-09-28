@@ -25,7 +25,7 @@
 | 16 | Explorer links | Each link opens the correct MSTScan transaction | PASS | Verified the transaction links in the Exam 3 chain-of-custody timeline; all visible transactions opened correctly on MSTScan |
 | 17 | Three custodians released | 3/5 reached; RELEASE AUTHORIZED | PASS | Exam 4 Centre 14 reached 3/5 approvals and showed RELEASE AUTHORIZED |
 | 18 | Centre 14 unlock | Commitment verified; paper successfully unlocked | PASS | Exam 4 Centre 14 reached 3/5 approvals, commitment was verified, and the encrypted paper successfully decrypted |
-| 19 | Record leak evidence | Evidence recorded successfully; transaction visible on MSTScan | NOT TESTED | |
+| 19 | Record leak evidence | Evidence recorded successfully; transaction visible on MSTScan | PASS | Leak traced to Centre 14; evidence and revoke transactions were confirmed on MSTScan |
 
 ## G0 — Wallet / Testnet Proof
 
