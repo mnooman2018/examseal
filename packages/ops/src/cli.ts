@@ -21,6 +21,8 @@ Commands:
   release --exam <id> --custodian 4[,5] [--wait]
       Release scripted custodian 4 and/or 5's pieces for every centre (one tx each).
       Refuses before release time unless --wait (waits in chain time, then sends).
+  simulate [--trials 1000] [--seed examseal-sim-v1] [--codebooks 5]
+      Run the §10 matcher simulation and write docs/SIMULATION.md (exit 2 if a target is missed).
 `;
 
 async function main(argv: string[]): Promise<number> {
@@ -38,6 +40,8 @@ async function main(argv: string[]): Promise<number> {
       force: { type: "boolean" },
       master: { type: "boolean" },
       provider: { type: "string" },
+      trials: { type: "string" },
+      codebooks: { type: "string" },
       "release-in": { type: "string" },
       "reveal-after": { type: "string" },
       "dry-run": { type: "boolean" },
@@ -92,6 +96,16 @@ async function main(argv: string[]): Promise<number> {
         );
       }
       return 0;
+    }
+    case "simulate": {
+      const { simulate } = await import("./simulate");
+      return simulate({
+        trials: values.trials ? Number(values.trials) : undefined,
+        seed: values.seed,
+        codebooks: values.codebooks ? Number(values.codebooks) : undefined,
+        paper: values.paper,
+        out: values.out,
+      });
     }
     default:
       console.log(USAGE);

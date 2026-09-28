@@ -4,6 +4,7 @@ import { describe, expect, it } from "vitest";
 import { canonicalJson } from "../src/canonical";
 import { type CentreCode, generateCodebook } from "../src/codebook";
 import { evidenceHash } from "../src/commit";
+import { MATCHER_VERSION } from "../src/forensic/constants";
 import { decide } from "../src/forensic/decide";
 import { buildEvidenceReport } from "../src/forensic/evidence";
 import { identifyQuestions } from "../src/forensic/identify";
@@ -186,7 +187,7 @@ describe("evidence report", () => {
     };
     const r = buildEvidenceReport(args);
     expect(r.version).toBe(1);
-    expect(r.matcherVersion).toBe("examseal-matcher/1");
+    expect(r.matcherVersion).toBe(MATCHER_VERSION);
     expect(() => canonicalJson(r)).not.toThrow();
     expect(evidenceHash(r)).toBe(evidenceHash(buildEvidenceReport(args)));
   });
