@@ -18,6 +18,7 @@ Owner: Sampurna. Updated at every gate.
 
 ## Deployment
 
+- **Site (permanent link):** https://examseal-one.vercel.app
 - `ExamSealRegistry` on MST Testnet: [`0x6F43B9891B642cCBf674FF4E33FdAcFEDDF41d37`](https://testnet.mstscan.com/address/0x6F43B9891B642cCBf674FF4E33FdAcFEDDF41d37) (verified).
 - **Exams 1 and 2 on the registry are test exams.** The first `pnpm ops seed` will create exam 3.
 
