@@ -47,7 +47,7 @@ Phase 4 stretch goals (/verify, backup set, create-exam wizard) are **cut** unle
 
 **B. QA row 4, wrong centre key file: any time before 07:00**
 1. `/centre`: load a **custodian** file (e.g. from `demo-data/secrets/exam-4/custodians/`) → expect "Missing centreId. Is this a centre key file?" and no crash.
-2. Copy `exam-4/centres/centre-14.centrekey.secret.json` to `centre-14-TAMPERED.centrekey.secret.json` in the same folder (gitignored). Change one hex digit of `x25519PrivateKey`. Load it → Centre 14 is Released 3/5 → **Unlock paper** → expect ✗ at "Open pieces…" with "Centre private key does not match the centre public key", nothing decrypted, no crash. Delete the copy afterwards.
+2. Copy `exam-4/centres/centre-14.centrekey.secret.json` to `centre-14-TAMPERED.centrekey.secret.json` in the same folder (gitignored). Change one hex digit **in the middle** of `x25519PrivateKey` (X25519 ignores a few bits at the very start and end, so an edge digit may change nothing). Load it → Centre 14 is Released 3/5 → **Unlock paper** → expect ✗ at "Open pieces and rebuild the key" with "Not enough valid pieces: 0 opened, 3 needed (3 could not be opened)", nothing decrypted, no crash. Delete the copy afterwards.
 
 **C. QA row 15, projector: any time before 07:00**
 Laptop at 1280×720 (display settings, or Chrome DevTools → device toolbar → Responsive 1280×720), zoom 100%. Open `/?exam=4`, `/exam/4` and a `/trace` result. Pass if every number, status and the result sentence are readable from the back of the room and nothing needs horizontal scrolling.
