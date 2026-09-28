@@ -12,10 +12,24 @@ function Mark({ v }: { v: boolean | undefined }) {
 }
 
 /** Verdict card. Numbers are counts from the matcher; there is no percentage "confidence" (§10). */
-export function ResultCard({ decision, identified, transcribed }: { decision: Decision; identified: number; transcribed: number }) {
+export function ResultCard({
+  decision,
+  identified,
+  transcribed,
+  seat,
+  source = "photo",
+  seatTracing = false,
+}: {
+  decision: Decision;
+  identified: number;
+  transcribed: number;
+  seat?: number;
+  source?: "photo" | "pasted";
+  seatTracing?: boolean;
+}) {
   const title =
     decision.kind === "MATCH"
-      ? `Leak traced to ${centreLabel(decision.centreId!)}`
+      ? `Leak traced to ${centreLabel(decision.centreId!)}${seat !== undefined ? `, Seat ${seat}` : ""}`
       : decision.kind === "INCONCLUSIVE"
         ? "Inconclusive: not attributed to any centre"
         : "Not this exam";
@@ -24,8 +38,15 @@ export function ResultCard({ decision, identified, transcribed }: { decision: De
       <h2>Result</h2>
       <div className={`${styles.verdict} ${decision.kind === "MATCH" ? styles.verdictMatch : styles.verdictOther}`}>{title}</div>
       <div className={styles.sentence}>{decision.reason}</div>
+      {decision.kind === "MATCH" && seat === undefined && (
+        <div className="muted small">
+          {seatTracing
+            ? "Seat not determined: attributed to the centre only (see the reason above)."
+            : "Centre-level result. Load the exam's seat variants to also trace a digital leak to a seat."}
+        </div>
+      )}
       <div className="muted small">
-        {identified} of {transcribed} transcribed question{transcribed === 1 ? "" : "s"} identified in the master paper. Features compared: printed
+        {identified} of {transcribed} {source === "pasted" ? "pasted" : "transcribed"} question{transcribed === 1 ? "" : "s"} identified in the master paper. Features compared: printed
         position, option order, and wording, for each identified question.
       </div>
     </section>
@@ -33,12 +54,15 @@ export function ResultCard({ decision, identified, transcribed }: { decision: De
 }
 
 /** Per-question ✓/✗ table against one centre's code. */
-export function FeatureTable({ master, observations, score }: { master: MasterPaper; observations: Observation[]; score: CentreScore }) {
+export function FeatureTable({ master, observations, score, seat }: { master: MasterPaper; observations: Observation[]; score: CentreScore; seat?: number }) {
   const byId = new Map(master.questions.map((q) => [q.id, q]));
   const rows = [...observations].sort((a, b) => (a.position ?? 99) - (b.position ?? 99));
   return (
     <section className="panel stack">
-      <h2>Feature check against {centreLabel(score.centreId)}</h2>
+      <h2>
+        Feature check against {centreLabel(score.centreId)}
+        {seat !== undefined ? `, Seat ${seat}` : ""}
+      </h2>
       <div className="table-wrap">
         <table>
           <thead>
@@ -109,7 +133,7 @@ export function RankingTable({ scores, limit = 5 }: { scores: CentreScore[]; lim
   );
 }
 
-export function EvidencePanel({ report, hash }: { report: EvidenceReport; hash: Hex }) {
+export function EvidencePanel({ report, hash, source = "photo" }: { report: EvidenceReport; hash: Hex; source?: "photo" | "pasted" }) {
   function download() {
     const blob = new Blob([canonicalJson(report)], { type: "application/json" });
     const url = URL.createObjectURL(blob);
@@ -127,7 +151,7 @@ export function EvidencePanel({ report, hash }: { report: EvidenceReport; hash: 
         <dd>
           <HashDisplay value={hash} />
         </dd>
-        <dt>Photo SHA-256</dt>
+        <dt>{source === "pasted" ? "Pasted text SHA-256" : "Photo SHA-256"}</dt>
         <dd>
           <HashDisplay value={report.imageSha256} />
         </dd>
@@ -138,7 +162,9 @@ export function EvidencePanel({ report, hash }: { report: EvidenceReport; hash: 
       </dl>
       <p className="muted small">
         Evidence hash = keccak256 of the canonical JSON below. Recording it on MST fixes this exact report; anyone holding the report can
-        recompute the hash and compare. The report contains the transcription and the scores, not the photo or the codebook.
+        recompute the hash and compare. {source === "pasted"
+          ? "The report contains the parsed questions and the scores, not the codebook."
+          : "The report contains the transcription and the scores, not the photo or the codebook."}
       </p>
       <div className="row">
         <button type="button" onClick={download}>

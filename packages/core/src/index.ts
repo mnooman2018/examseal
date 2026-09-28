@@ -24,3 +24,4 @@ export * from "./forensic/evidence";
 export * from "./forensic/synthetic";
 export * from "./candidate";
 export * from "./forensic/seat";
+export * from "./forensic/pasted";
