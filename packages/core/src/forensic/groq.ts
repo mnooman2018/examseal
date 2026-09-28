@@ -7,8 +7,16 @@ import { type CallOnce, ExtractorError, type ProviderPlan } from "./extractor";
 export const GROQ_VISION_MODELS = ["qwen/qwen3.8-27b"] as const;
 
 const ENDPOINT = "https://api.groq.com/openai/v1/chat/completions";
-// An image costs 2048 input tokens; with the prompt and this cap a call stays under the 8K TPM limit.
-const MAX_COMPLETION_TOKENS = 4000;
+// The free plan also caps OUTPUT at 1,000 tokens per minute (OTPM); a larger max makes Groq refuse the
+// request as "too large". A 12-question transcription is about 730 output tokens.
+const MAX_COMPLETION_TOKENS = 1000;
+/**
+ * Groq counts 2,048 input tokens per image. On 29 Sep 2026 every test request to qwen/qwen3.8-27b
+ * used about 960 prompt tokens in total and returned a fluent but invented paper: the image was not
+ * being read. A reply whose prompt usage is below this is discarded, so a fabricated transcription
+ * can never reach the matcher (it would turn a real leak into "Not this exam"). See D7.
+ */
+export const GROQ_MIN_PROMPT_TOKENS_WITH_IMAGE = 2048;
 /** Time kept back for Groq when it runs after Gemini. */
 export const GROQ_RESERVE_MS = 15_000;
 
@@ -51,7 +59,10 @@ export function groqCallOnce(args: { apiKey: string; imageBase64: string; mediaT
     if (!res.ok) {
       const code = body.error?.code ?? body.error?.type;
       const msg = `${res.status}${code ? ` ${code}` : ""}: ${body.error?.message ?? res.statusText}`;
-      const kind = res.status === 429 || res.status >= 500 ? "busy" : res.status === 404 || res.status === 403 ? "unavailable" : "fatal";
+      // A 429 "Request too large" will never pass on retry; only true rate limits are "busy".
+      const tooLarge = /request too large|exceed the enforced limit/i.test(body.error?.message ?? "");
+      const kind =
+        (res.status === 429 && !tooLarge) || res.status >= 500 ? "busy" : res.status === 404 || res.status === 403 ? "unavailable" : "fatal";
       const h = res.headers.get("retry-after");
       throw new ExtractorError(msg, kind, h && /^[\d.]+$/.test(h) ? Math.round(Number(h) * 1000) : undefined);
     }
@@ -59,6 +70,13 @@ export function groqCallOnce(args: { apiKey: string; imageBase64: string; mediaT
     // Defensive: strip any reasoning block if one slips through.
     const text = (choice?.message?.content ?? "").replace(/<think>[\s\S]*?<\/think>/g, "").trim();
     if (!text) throw new ExtractorError(`returned no text (finish_reason: ${choice?.finish_reason ?? "none"})`, "invalid");
+    const promptTokens = body.usage?.prompt_tokens;
+    if (typeof promptTokens !== "number" || promptTokens < GROQ_MIN_PROMPT_TOKENS_WITH_IMAGE) {
+      throw new ExtractorError(
+        `did not read the image (the request used ${promptTokens ?? "an unknown number of"} prompt tokens; Groq counts ${GROQ_MIN_PROMPT_TOKENS_WITH_IMAGE} per image), so its output was discarded`,
+        "unavailable",
+      );
+    }
     try {
       return { extraction: parseExtraction(text), usage: body.usage };
     } catch (e) {

@@ -99,14 +99,18 @@ async function main(argv: string[]): Promise<number> {
   }
 }
 
+// Set the exit code and let Node exit on its own. Calling process.exit() while fetch's keep-alive
+// sockets are closing crashes Node on Windows (libuv "UV_HANDLE_CLOSING" assertion).
 main(process.argv.slice(2)).then(
-  (code) => process.exit(code),
+  (code) => {
+    process.exitCode = code;
+  },
   (err) => {
     if (err instanceof UserError || err?.code === "ERR_PARSE_ARGS_UNKNOWN_OPTION") {
       console.error(`Error: ${err.message}`);
     } else {
       console.error(err);
     }
-    process.exit(1);
+    process.exitCode = 1;
   },
 );

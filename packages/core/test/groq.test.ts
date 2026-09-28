@@ -2,7 +2,7 @@ import { describe, expect, it } from "vitest";
 import { EXTRACTION_SYSTEM_PROMPT } from "../src/forensic/extraction";
 import { extractWithFallback } from "../src/forensic/extractor";
 import { GEMINI_VISION_MODELS, geminiPlan } from "../src/forensic/gemini";
-import { GROQ_VISION_MODELS, groqPlan } from "../src/forensic/groq";
+import { GROQ_MIN_PROMPT_TOKENS_WITH_IMAGE, GROQ_VISION_MODELS, groqPlan } from "../src/forensic/groq";
 
 const GOOD = '{"questions":[{"printedNumber":1,"text":"Which gate?","options":[{"label":"A","text":"AND"}]}],"legibility":"good"}';
 const GEMINI_KEY = "gemini-test-key";
@@ -10,7 +10,11 @@ const GROQ_KEY = "groq-test-key";
 
 type R = { status: number; body: unknown };
 const geminiReply = (text: string): R => ({ status: 200, body: { candidates: [{ content: { parts: [{ text }] } }] } });
-const groqReply = (content: string): R => ({ status: 200, body: { choices: [{ message: { content }, finish_reason: "stop" }] } });
+/** A real image costs 2,048 prompt tokens on Groq; 961 is what the unread-image replies reported. */
+const groqReply = (content: string, promptTokens = 2300): R => ({
+  status: 200,
+  body: { choices: [{ message: { content }, finish_reason: "stop" }], usage: { prompt_tokens: promptTokens, completion_tokens: 700 } },
+});
 const gemini503: R = { status: 503, body: { error: { status: "UNAVAILABLE", message: "high demand" } } };
 const groq429: R = { status: 429, body: { error: { code: "rate_limit_exceeded", message: "Rate limit reached" } } };
 
@@ -91,6 +95,30 @@ describe("Groq last-resort provider", () => {
   it("strips a stray <think> block and validates with zod", async () => {
     const f = fake({ gemini: () => gemini503, groq: () => groqReply(`<think>looking at the page</think>${GOOD}`) });
     expect((await f.run(10 * 60_000)).extraction.questions[0].text).toBe("Which gate?");
+  });
+
+  it("discards a reply whose token usage shows the image was not read (fabrication guard)", async () => {
+    const f = fake({ gemini: () => gemini503, groq: () => groqReply(GOOD, 961) });
+    const err = await f.run(10 * 60_000).catch((e) => e);
+    expect(err.message).toMatch(/Every vision model is busy or unavailable/);
+    expect(err.message).toContain(`Groq ${GROQ_VISION_MODELS[0]} (unavailable)`);
+    expect(f.calls.filter((c) => c.api === "groq")).toHaveLength(1);
+    expect(GROQ_MIN_PROMPT_TOKENS_WITH_IMAGE).toBe(2048);
+  });
+
+  it("does not retry a 'Request too large' 429", async () => {
+    const f = fake({
+      gemini: () => gemini503,
+      groq: () => ({ status: 429, body: { error: { code: "rate_limit_exceeded", message: "Request too large for model: reduce max_tokens" } } }),
+    });
+    await f.run(10 * 60_000).catch(() => undefined);
+    expect(f.calls.filter((c) => c.api === "groq")).toHaveLength(1);
+  });
+
+  it("caps output at the free plan's 1,000 tokens per minute", async () => {
+    const f = fake({ gemini: () => gemini503, groq: () => groqReply(GOOD) });
+    await f.run(10 * 60_000);
+    expect(JSON.parse(f.calls.find((c) => c.api === "groq")!.init.body as string).max_completion_tokens).toBe(1000);
   });
 
   it("names both providers when everything fails", async () => {
