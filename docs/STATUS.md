@@ -32,6 +32,31 @@ Owner: Sampurna. Updated at every gate.
 
 Phase 4 stretch goals (/verify, backup set, create-exam wizard) are **cut** unless G4 is green well before 07:00 (§4: "shrink Phase 4 first"). The never-cut list in §4 is unchanged.
 
+## G4 plan (checked 02:25)
+
+§13 rows in `docs/QA.md` already PASS: 1, 2, 3, 13, 14 (iPhone), 16, 17, 18. Hosted-site machine checks PASS (see log 02:25). Remaining:
+
+**A. Finish G3 + QA rows 19 and 5: before 07:00, whoever holds the Authority BridgeKey profile**
+1. Chrome "Authority" profile. The connected wallet must be **0xC028f228E2B0697d0EaA63f4C818de205c1fE0Ef** (exam 3's authority; `/trace` step 1 shows it).
+2. Open https://examseal-one.vercel.app/trace?exam=3. Load `demo-data/master-paper.json`, then `demo-data/secrets/exam-3/codebook.secret.json`.
+3. Choose a Centre 14 photo (`C:Dev	race-test.png` works) → **Transcribe the photo** → expect "Leak traced to Centre 14".
+4. In "4 · Accountability on MST" there must be **no** yellow "not this exam's authority" banner (if there is, switch wallet). Click **Record evidence on MST** → sign → wait for "confirmed in block N" → copy the MSTScan link into QA row 19.
+5. Click **Revoke Centre 14** → sign → confirmed → red DO NOT USE banner. Copy the link.
+6. Check `/?exam=3` (Centre 14 tile red, COMPROMISED) and `/exam/3` (timeline shows LeakRecorded and CentreRevoked).
+7. Row 5: open `/centre`, load `demo-data/secrets/exam-3/centres/centre-14.centrekey.secret.json` → red DO NOT USE banner, Unlock disabled. (The contract skipping releases for a revoked centre with reason 1 is covered by contract test "compromised → skipped(1)"; the site and `ops release` deliberately never send a release for a revoked centre.)
+
+**B. QA row 4, wrong centre key file: any time before 07:00**
+1. `/centre`: load a **custodian** file (e.g. from `demo-data/secrets/exam-4/custodians/`) → expect "Missing centreId. Is this a centre key file?" and no crash.
+2. Copy `exam-4/centres/centre-14.centrekey.secret.json` to `centre-14-TAMPERED.centrekey.secret.json` in the same folder (gitignored). Change one hex digit of `x25519PrivateKey`. Load it → Centre 14 is Released 3/5 → **Unlock paper** → expect ✗ at "Open pieces…" with "Centre private key does not match the centre public key", nothing decrypted, no crash. Delete the copy afterwards.
+
+**C. QA row 15, projector: any time before 07:00**
+Laptop at 1280×720 (display settings, or Chrome DevTools → device toolbar → Responsive 1280×720), zoom 100%. Open `/?exam=4`, `/exam/4` and a `/trace` result. Pass if every number, status and the result sentence are readable from the back of the room and nothing needs horizontal scrolling.
+
+**D. QA rows 6–12, leak photos: 08:00–10:00 (testing only, no code)**
+For each photo in `demo-data/leaks/`: `/trace?exam=4` → load the master paper and any demo exam's `codebook.secret.json` (all demo exams share the demo codebook) → choose the photo → Transcribe. Record the result sentence and evidence hash in QA. **Do not click Record or Revoke during photo tests.**
+- Expected: photos 1–3 and 6 → Centre 14. Photos 4 and 5 (half pages, about 6 questions) → Centre 14 (`docs/SIMULATION.md`: 6 visible questions matched 1000 of 1000). Photo 7 (master order) → INCONCLUSIVE.
+- If a real Centre 14 photo comes out INCONCLUSIVE or NOT_THIS_EXAM, expand "AI transcription" and note what was misread. Report it by **09:15** so any fix lands before the 10:00 code freeze.
+
 ## Deployment
 
 - **Site (permanent link):** https://examseal-one.vercel.app
