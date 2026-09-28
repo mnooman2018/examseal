@@ -15,7 +15,14 @@ import os from "node:os";
 import path from "node:path";
 import {
   type CentreCode,
+  buildEvidenceReport,
   canonicalJson,
+  decide,
+  evidenceHash,
+  identifyQuestions,
+  reasonHash,
+  scoreCentres,
+  syntheticExtraction,
   type Hex,
   decodeFingerprint,
   fromHexBytes,
@@ -98,7 +105,7 @@ async function main() {
   console.log("\nChecks:");
   const read = <T>(functionName: string, args: unknown[]) =>
     pc.readContract({ address: registry, abi: registryAbi, functionName: functionName as never, args: args as never }) as Promise<T>;
-  type CentreView = { status: number; approvals: number; registeredBlock: bigint; variantCommitment: Hex; encPubKey: Hex };
+  type CentreView = { status: number; approvals: number; registeredBlock: bigint; variantCommitment: Hex; encPubKey: Hex; lastEvidenceHash: Hex };
 
   // secret files
   const custFiles = readdirSync(path.join(dir, "custodians")).sort();
@@ -220,6 +227,51 @@ async function main() {
     if (JSON.stringify(decoded) !== JSON.stringify(code)) throw new Error(`centre ${c.centreId}: fingerprint does not decode to its code`);
   }
   check(true, "all 20 fingerprints reveal on-chain (commitments match) and decode to the codebook");
+
+  // /trace accountability: same matcher + same recordLeak / revokeCentre argument shapes as the page.
+  const code14 = codebook.centres.find((c) => c.centreId === 14)!;
+  const leak = syntheticExtraction(master.paper, code14, [1, 2, 3, 4, 5, 6, 7, 8]);
+  const obs = identifyQuestions(leak, master.paper);
+  const scores = scoreCentres(obs, codebook.centres);
+  const decision = decide(scores, obs.length);
+  check(decision.kind === "MATCH" && decision.centreId === 14, `trace: ${decision.reason}`);
+  const report = buildEvidenceReport({
+    examId: examId.toString(),
+    imageSha256: keccak256("0x00"),
+    extraction: leak,
+    observations: obs,
+    scores,
+    decision,
+    createdAt: new Date().toISOString(),
+  });
+  const evidence = evidenceHash(report);
+  const authority = walletFor(0);
+  const leakTx = await authority.writeContract({
+    address: registry,
+    abi: registryAbi,
+    functionName: "recordLeak",
+    args: [examId, 14, evidence, decision.best!.matched, decision.best!.observed],
+  });
+  await pc.waitForTransactionReceipt({ hash: leakTx });
+  c14 = await read<CentreView>("getCentre", [examId, 14]);
+  check(c14.lastEvidenceHash === evidence, "recordLeak stores this report's evidence hash for centre 14");
+  const revokeTx14 = await authority.writeContract({
+    address: registry,
+    abi: registryAbi,
+    functionName: "revokeCentre",
+    args: [examId, 14, reasonHash(`Leak traced to Centre 14. Evidence ${evidence}`)],
+  });
+  await pc.waitForTransactionReceipt({ hash: revokeTx14 });
+  c14 = await read<CentreView>("getCentre", [examId, 14]);
+  check(c14.status === 3, "revokeCentre marks centre 14 Compromised");
+  let notAuthority = "";
+  try {
+    await pc.simulateContract({ account: dev(1), address: registry, abi: registryAbi, functionName: "recordLeak", args: [examId, 14, evidence, 1, 1] });
+  } catch (e) {
+    const r = e instanceof BaseError ? e.walk((x) => x instanceof ContractFunctionRevertedError) : null;
+    notAuthority = r instanceof ContractFunctionRevertedError ? (r.data?.errorName ?? "") : "";
+  }
+  check(notAuthority === "NotAuthority", "recordLeak from a non-authority wallet reverts NotAuthority");
 
   console.log(`\nPASS: ${passed} checks. Secrets for this local run: ${dir}`);
 }

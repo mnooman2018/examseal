@@ -1,0 +1,43 @@
+.photo {
+  display: block;
+  max-width: 100%;
+  max-height: 22rem;
+  border: 1px solid var(--line);
+  background: #fff;
+}
+
+.verdict {
+  font-size: 1.6rem;
+  font-weight: 800;
+  line-height: 1.25;
+}
+
+.verdictMatch {
+  color: var(--red);
+}
+
+.verdictOther {
+  color: var(--amber);
+}
+
+.sentence {
+  font-size: 1.15rem;
+  font-family: var(--mono);
+  overflow-wrap: anywhere;
+}
+
+.json {
+  max-height: 24rem;
+  overflow: auto;
+  font-family: var(--mono);
+  font-size: 0.8rem;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  border: 1px solid var(--line);
+  padding: 0.6rem;
+}
+
+.qtext {
+  white-space: normal;
+  min-width: 14rem;
+}

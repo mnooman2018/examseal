@@ -44,3 +44,20 @@ export function parseExtraction(raw: string): Extraction {
   }
   return r.data;
 }
+
+/** §10: the browser compresses to ≤ 3 MB, keeping the request under Vercel's ~4.5 MB body limit. */
+export const EXTRACT_MAX_IMAGE_BYTES = 3 * 1024 * 1024;
+export const EXTRACT_MEDIA_TYPES = ["image/jpeg", "image/png", "image/webp"] as const;
+
+/** Body of POST /api/extract. */
+export const ExtractRequestSchema = z
+  .object({
+    imageBase64: z
+      .string()
+      .min(16, "image is empty")
+      .max(Math.ceil((EXTRACT_MAX_IMAGE_BYTES * 4) / 3) + 4, "image is larger than 3 MB after compression")
+      .regex(/^[A-Za-z0-9+/]+={0,2}$/, "imageBase64 must be plain base64 (no data: prefix)"),
+    mediaType: z.enum(EXTRACT_MEDIA_TYPES),
+  })
+  .strict();
+export type ExtractRequest = z.infer<typeof ExtractRequestSchema>;

@@ -1,24 +1,27 @@
 import { readFileSync, statSync } from "node:fs";
 import path from "node:path";
-import { EXTRACTION_SYSTEM_PROMPT, type Extraction, parseExtraction } from "examseal-core";
+import {
+  EXTRACT_MAX_IMAGE_BYTES,
+  ExtractorError,
+  type ProviderPlan,
+  extractWithFallback,
+  geminiPlan,
+  groqPlan,
+} from "examseal-core";
 import { UserError, loadEnv, userPath } from "./env";
 
 /**
- * pnpm ops check-extractor <image-path>
+ * pnpm ops check-extractor <image-path> [--provider auto|gemini|groq]
  *
- * Sends one photo to the Gemini vision model with the §10 prompt and prints the
- * validated Extraction JSON. GEMINI_API_KEY is read from .env.local and only ever
- * sent in the x-goog-api-key request header; it is never printed or logged.
+ * Sends one photo with the §10 prompt (same code as /api/extract) and prints the validated
+ * Extraction JSON. auto (default) = Gemini with model fallback, then Groq as a last resort if
+ * GROQ_API_KEY is set. Keys are read from .env.local and only ever sent in request headers;
+ * they are never printed or logged.
  */
 
-// gemini-3.8-flash: newest stable Gemini model with image input on the free tier
-// (ai.google.dev/gemini-api/docs/models and /pricing, checked 28 Sep 2026).
-export const DEFAULT_GEMINI_MODEL = "gemini-3.8-flash";
-const ENDPOINT = "https://generativelanguage.googleapis.com/v1beta/models";
-// Inline requests are capped at 20 MB; the web app compresses to ≤ 3 MB first (§10).
-const MAX_IMAGE_BYTES = 15 * 1024 * 1024;
-// Higher than Claude's 4000 in §10: on Gemini, thinking tokens count toward this limit.
-const MAX_OUTPUT_TOKENS = 8192;
+// The web app compresses to ≤ 3 MB (§10). The CLI sends the file as-is, so allow more here;
+// inline Gemini requests are capped at 20 MB, Groq image requests at 20 MB.
+const MAX_IMAGE_BYTES = Math.max(EXTRACT_MAX_IMAGE_BYTES, 15 * 1024 * 1024);
 
 const MEDIA_TYPES: Record<string, string> = {
   ".jpg": "image/jpeg",
@@ -29,41 +32,12 @@ const MEDIA_TYPES: Record<string, string> = {
   ".heif": "image/heif",
 };
 
-type GeminiResponse = {
-  candidates?: { content?: { parts?: { text?: string; thought?: boolean }[] }; finishReason?: string }[];
-  promptFeedback?: { blockReason?: string };
-  usageMetadata?: Record<string, number>;
-  error?: { code?: number; message?: string; status?: string };
-};
+const LABEL: Record<string, string> = { gemini: "Gemini", groq: "Groq" };
 
-async function callGemini(apiKey: string, model: string, imageBase64: string, mediaType: string): Promise<string> {
-  const res = await fetch(`${ENDPOINT}/${encodeURIComponent(model)}:generateContent`, {
-    method: "POST",
-    headers: { "content-type": "application/json", "x-goog-api-key": apiKey },
-    body: JSON.stringify({
-      systemInstruction: { parts: [{ text: EXTRACTION_SYSTEM_PROMPT }] },
-      contents: [{ role: "user", parts: [{ inlineData: { mimeType: mediaType, data: imageBase64 } }] }],
-      generationConfig: { temperature: 0, maxOutputTokens: MAX_OUTPUT_TOKENS, responseMimeType: "application/json" },
-    }),
-  });
-  const body = (await res.json().catch(() => ({}))) as GeminiResponse;
-  if (!res.ok) {
-    throw new UserError(`Gemini API error ${res.status} ${body.error?.status ?? ""}: ${body.error?.message ?? res.statusText}`);
-  }
-  if (body.promptFeedback?.blockReason) throw new UserError(`Gemini blocked the request: ${body.promptFeedback.blockReason}`);
-  const cand = body.candidates?.[0];
-  const text = (cand?.content?.parts ?? [])
-    .filter((p) => !p.thought && typeof p.text === "string")
-    .map((p) => p.text)
-    .join("");
-  if (body.usageMetadata) console.error(`  tokens: ${JSON.stringify(body.usageMetadata)}`);
-  if (cand?.finishReason && cand.finishReason !== "STOP") console.error(`  finishReason: ${cand.finishReason}`);
-  if (!text) throw new Error(`empty response (finishReason: ${cand?.finishReason ?? "none"})`);
-  return text;
-}
-
-export async function checkExtractor(imagePath: string | undefined): Promise<number> {
-  if (!imagePath) throw new UserError("Usage: pnpm ops check-extractor <image-path>");
+export async function checkExtractor(imagePath: string | undefined, opts: { provider?: string } = {}): Promise<number> {
+  if (!imagePath) throw new UserError("Usage: pnpm ops check-extractor <image-path> [--provider auto|gemini|groq]");
+  const which = (opts.provider ?? "auto").toLowerCase();
+  if (!["auto", "gemini", "groq"].includes(which)) throw new UserError("--provider must be auto, gemini or groq");
   const file = userPath(imagePath);
   let size: number;
   try {
@@ -76,32 +50,40 @@ export async function checkExtractor(imagePath: string | undefined): Promise<num
   if (size > MAX_IMAGE_BYTES) throw new UserError(`Image is ${(size / 1e6).toFixed(1)} MB; max 15 MB`);
 
   loadEnv();
-  const apiKey = process.env.GEMINI_API_KEY?.trim();
-  if (!apiKey) throw new UserError("GEMINI_API_KEY is not set in .env.local");
-  const model = process.env.GEMINI_MODEL?.trim() || DEFAULT_GEMINI_MODEL;
-
-  const imageBase64 = readFileSync(file).toString("base64");
-  console.error(`Sending ${path.basename(file)} (${(size / 1e6).toFixed(2)} MB, ${mediaType}) to ${model}…`);
-
-  // §10: invalid output gets one retry, then a clear error.
-  let extraction: Extraction | undefined;
-  for (let attempt = 1; attempt <= 2 && !extraction; attempt++) {
-    const started = Date.now();
-    try {
-      const raw = await callGemini(apiKey, model, imageBase64, mediaType);
-      extraction = parseExtraction(raw);
-      console.error(`  attempt ${attempt}: valid Extraction in ${((Date.now() - started) / 1000).toFixed(1)} s`);
-    } catch (e) {
-      if (e instanceof UserError) throw e;
-      console.error(`  attempt ${attempt}: ${(e as Error).message}`);
-      if (attempt === 2) throw new UserError("The model did not return a valid Extraction after one retry.");
-    }
+  const geminiKey = process.env.GEMINI_API_KEY?.trim();
+  const groqKey = process.env.GROQ_API_KEY?.trim();
+  const image = { imageBase64: readFileSync(file).toString("base64"), mediaType };
+  const providers: ProviderPlan[] = [];
+  if (which !== "groq") {
+    if (!geminiKey) throw new UserError("GEMINI_API_KEY is not set in .env.local");
+    providers.push(geminiPlan({ apiKey: geminiKey, model: process.env.GEMINI_MODEL, ...image }));
+  }
+  if (which !== "gemini") {
+    if (groqKey) providers.push(groqPlan({ apiKey: groqKey, model: process.env.GROQ_MODEL, ...image }));
+    else if (which === "groq") throw new UserError("GROQ_API_KEY is not set in .env.local");
   }
 
-  console.log(JSON.stringify(extraction, null, 2));
-  const x = extraction!;
-  console.error(
-    `\n${x.questions.length} question(s), ${x.questions.reduce((n, q) => n + q.options.length, 0)} option(s), legibility: ${x.legibility}`,
-  );
-  return 0;
+  console.error(`Sending ${path.basename(file)} (${(size / 1e6).toFixed(2)} MB, ${mediaType})`);
+  for (const p of providers) console.error(`  ${LABEL[p.name]}: ${[...new Set(p.models)].join(" → ")}`);
+  const started = Date.now();
+  try {
+    const r = await extractWithFallback({
+      providers,
+      budgetMs: 120_000, // the CLI can wait longer than the 60 s web route
+      onAttempt: (a) =>
+        console.error(`  ${LABEL[a.provider]} ${a.model} attempt ${a.attempt}: ${a.ok ? "valid Extraction" : `${a.kind}: ${a.error}`}`),
+    });
+    console.log(JSON.stringify(r.extraction, null, 2));
+    const x = r.extraction;
+    if (r.usage) console.error(`  tokens: ${JSON.stringify(r.usage)}`);
+    console.error(
+      `\nModel that answered: ${LABEL[r.provider]} ${r.model} (${r.attempts} call${r.attempts === 1 ? "" : "s"} in total)` +
+        `\n${x.questions.length} question(s), ${x.questions.reduce((n, q) => n + q.options.length, 0)} option(s), legibility: ${x.legibility}` +
+        ` · ${((Date.now() - started) / 1000).toFixed(1)} s`,
+    );
+    return 0;
+  } catch (e) {
+    if (e instanceof ExtractorError) throw new UserError(e.message);
+    throw e;
+  }
 }
