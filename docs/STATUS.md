@@ -13,7 +13,7 @@ Owner: Sampurna. Updated at every gate.
 | G0 | H1 | 22:43 (28 Sep) | A real testnet transaction from our repo; BridgeKey signing on localhost | **Done** (Nooman) |
 | G1 | H4 | 01:43 (29 Sep) | `ExamSealRegistry` deployed and verified on testnet; all contract tests green | **Done** (merged to main 39d459c) |
 | G2 | H4–H5 | 01:43–02:43 | Core round trip (encrypt → split → seal → open any 3 → decrypt); 2 pieces fail; TS commitments equal Solidity | **Done** (65 core tests incl. Solidity cross-check) |
-| G3 | H10 | 07:43 | MVP end to end on testnet (seed → rejected early release → 3 releases → decrypt → trace → evidence → revoke). If this slips past H12 (09:43), apply the cut list | **Done** (exam 3, Centre 14; see log) |
+| G3 | H10 | 07:43 | MVP end to end on testnet (seed → rejected early release → 3 releases → decrypt → trace → evidence → revoke). If this slips past H12 (09:43), apply the cut list | **Partly done.** Missing on-chain: record evidence + revoke (see log, 02:25) |
 | G4 | – | **07:00** | Public link works on a phone; attack checklist (§13) passes **on the hosted site**. **Feature freeze** | Pending |
 | Code freeze | – | **10:00** | No code changes after this. Tag `v1.0`, final Vercel deploy, `pnpm test` and `pnpm build` green on `main` | Pending |
 | G5 | – | **11:00** | Demo video recorded on the frozen v1.0 deploy; README complete (§14 checklist) | Pending |
@@ -64,6 +64,8 @@ Phase 4 stretch goals (/verify, backup set, create-exam wizard) are **cut** unle
 - G0 and G1 done (Nooman): Hello deployed; ExamSealRegistry deployed and verified; 29 contract tests green. nooman/contract merged to main.
 - G2 done: core round trip, 2 pieces fail, and TypeScript fingerprint commitment equals the contract fixture.
 - Master paper moved from dhruva/exam.json to demo-data/master-paper.json; validate-paper OK (12 questions).
-- G3 done on exam 3: seed, rejected early release, custodian releases, Centre 14 decrypted, a photo of Centre 14's printout traced to Centre 14 (36 of 36 features, locally), then Adithi recorded the evidence and revoked Centre 14 from the live site. Tx links are on the `/exam/3` chain-of-custody timeline.
+- G3 (reported earlier as done): seed, rejected early release, custodian releases, Centre 14 decrypted, and a photo of Centre 14's printout traced to Centre 14 (36 of 36 features, locally).
+- **02:25 correction: G3 is not complete.** A read of the registry found **no LeakRecorded and no CentreRevoked event on any exam (1–4)**; exam 3 Centre 14 is Released 5/5 with no evidence hash, exam 4 Centre 14 is Released 3/5. MSTScan shows the authority wallet (0xC028…E0Ef) never sent recordLeak or revokeCentre, not even a failed one. The hosted /trace does contain both actions. Most likely the record/revoke was attempted with a non-authority wallet or not signed. To finish G3: on the hosted /trace, connected as the authority wallet, record evidence and revoke Centre 14 (steps in the G4 plan below).
 - 02:15: real deadline is 13:00, not 21:43. G4 → 07:00 (feature freeze), code freeze 10:00, G5 → 11:00, G6 → 12:00. Phase 4 stretch cut. Sleep rotation needs redoing.
 - Phase 3: `ops simulate` run; `docs/SIMULATION.md` written. Thresholds tuned from it (D8): 0 wrong of 6,000 real leaks, 0 false matches of 7,000 fake leaks on the published run.
+- 02:25 G4 machine checks against https://examseal-one.vercel.app: all pages 200; RPC proxy on chain 91562037; /api/extract rejects bad bodies (400), extra fields (400) and cross-origin (403); a real photo transcribed on the hosted site with Vercel's keys (Gemini gemini-3.8-flash, 11.5 s, 12/12 questions agree with the local transcription). Fix on branch sampurna/g4-fixes: ops scripts prefer IPv4 (Node fetch hit ECONNRESET over IPv6 on this laptop).
