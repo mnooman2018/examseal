@@ -1,4 +1,7 @@
 # ExamSeal QA
+## Hosted Application
+
+**URL:** https://examseal-one.vercel.app/
 
 ## Manual QA Checklist
 
