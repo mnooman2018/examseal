@@ -1,0 +1,8 @@
+{
+  "description": "fingerprintCommitment computed with viem encodeAbiParameters + keccak256 (CLAUDE.md §7). Contract must accept it.",
+  "examId": "7",
+  "centreId": 14,
+  "fingerprint": "0x01010000020501030a00040f01051400060101070600080b010910000a15010b02000c0701",
+  "salt": "0xabababababababababababababababababababababababababababababababab",
+  "fingerprintCommitment": "0x128be23c550b3ddaca238e446ce8bf95db915b817acf76851cfc59f33430f74f"
+}
