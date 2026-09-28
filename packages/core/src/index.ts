@@ -13,3 +13,4 @@ export * from "./variant";
 export * from "./forensic/types";
 export * from "./forensic/normalize";
 export * from "./forensic/extraction";
+export * from "./forensic/gemini";
