@@ -193,7 +193,7 @@ function CentreStatusPanel({ file, exam, centre }: { file: CentreKeyFile; exam: 
             {steps.map((s, i) => (
               <li key={i}>
                 <strong>
-                  {s.state === "ok" ? <span className="check-ok">✓ </span> : s.state === "bad" ? <span className="check-bad">✗ </span> : s.state === "waiting" ? "⧗ " : "… "}
+                  {s.state === "ok" ? <span className="check-ok">✓ </span> : s.state === "bad" ? <span className="check-bad">✗ </span> : s.state === "waiting" ? "Waiting: " : "… "}
                   {s.label}
                 </strong>
                 {s.detail && <div className="small muted">{s.detail}</div>}

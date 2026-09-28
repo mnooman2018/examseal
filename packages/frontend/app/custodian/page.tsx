@@ -173,7 +173,7 @@ function CustodianConsole({ file }: { file: CustodianFile }) {
                     <tr key={s.centreId}>
                       <td>{centreLabel(s.centreId)}</td>
                       <td>{c ? <StatusPill status={c.status} /> : <span className="muted">not registered</span>}</td>
-                      <td className="mono">{c ? `${c.approvals}/${exam.custodians.length}` : "—"}</td>
+                      <td className="mono">{c ? `${c.approvals}/${exam.custodians.length}` : "n/a"}</td>
                       <td>{released.data === undefined ? "…" : mine ? <span className="check-ok">released</span> : <span className="muted">held</span>}</td>
                     </tr>
                   );

@@ -7,7 +7,7 @@ import { useMstWallet } from "@/hooks/useMstWallet";
 /**
  * Demonstrates the MST SDK end-to-end: generate a wallet, check its
  * balance through the provider, estimate gas, and send a native transfer.
- * Uses a fresh in-browser burner key, so it's safe to click around with —
+ * Uses a fresh in-browser burner key, so it's safe to click around with:
  * fund it from the testnet faucet, never a real wallet.
  */
 export function SdkWalletPanel() {
@@ -71,7 +71,7 @@ export function SdkWalletPanel() {
       <h2>SDK Wallet Playground</h2>
       <p className="hint">
         Powered by <code>@mstblockchain/mst-sdk</code>. Generates a burner wallet in your
-        browser — testnet only, never fund it with real assets.
+        browser. Testnet only, never fund it with real assets.
       </p>
 
       {!address ? (
@@ -95,7 +95,7 @@ export function SdkWalletPanel() {
           <div className="sdk-row">
             <span className="hint">Balance</span>
             <span className="wallet-address mono">
-              {balance !== null ? `${formatEther(BigInt(balance))} MST` : "—"}
+              {balance !== null ? `${formatEther(BigInt(balance))} MST` : "n/a"}
             </span>
             <button disabled={loadingBalance} onClick={refreshBalance}>
               {loadingBalance ? "Checking…" : "Check balance"}
