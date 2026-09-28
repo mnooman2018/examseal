@@ -7,7 +7,7 @@
 
 | # | Test | Expected Result | Status | Evidence |
 |---|---|---|---|---|
-| 1 | Centre with 1/5 release | Centre cannot unlock paper | NOT TESTED | |
+| 1 | Centre with 1/5 release | Centre cannot unlock paper | PASS | Exam 4 Centre 14 showed 1/5 approvals and the paper remained locked |
 | 2 | Centre with 2/5 releases | Centre cannot unlock paper | NOT TESTED | |
 | 3 | Attempt early release | Transaction is rejected; failed tx visible on MSTScan | PASS | Exam 4: Custodians 1–3 early release attempts rejected with `ReleaseNotStarted` |
 | 4 | Wrong centre key file | Clear error; application does not crash | NOT TESTED | |
