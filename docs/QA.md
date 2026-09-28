@@ -20,3 +20,12 @@
 | 14 | Phone view | Usable | NOT TESTED | |
 | 15 | Projector view | Readable | NOT TESTED | |
 | 16 | Explorer links | Each link opens the correct MSTScan transaction | NOT TESTED | |
+| 17 | Three custodians released | 3/5 reached; RELEASE AUTHORIZED | NOT TESTED | |
+| 18 | Centre 14 unlock | Commitment verified; paper successfully unlocked | NOT TESTED | |
+| 19 | Record leak evidence | Evidence recorded successfully; transaction visible on MSTScan | NOT TESTED | |
+## G0 — Wallet / Testnet Proof
+
+| Check | Status | Evidence |
+|---|---|---|
+| Authority wallet signed Hello.setMessage | PASS | 0x5506785ef7addaddef0cef47aed2329c8f33a798c2a7f6949c575b4540af2530 |
+| Hello.setMessage transaction confirmed on MST Testnet | PASS | https://testnet.mstscan.com/tx/0x5506785ef7addaddef0cef47aed2329c8f33a798c2a7f6949c575b4540af2530 |
