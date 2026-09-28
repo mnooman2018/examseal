@@ -146,6 +146,812 @@ export const deployments = {
       "constructorArguments": [
         "Hello, MST!"
       ]
+    },
+    "ExamSealRegistry": {
+      "address": "0x6F43B9891B642cCBf674FF4E33FdAcFEDDF41d37",
+      "abi": [
+        {
+          "inputs": [],
+          "name": "AlreadyRevealed",
+          "type": "error"
+        },
+        {
+          "inputs": [],
+          "name": "BadCustodians",
+          "type": "error"
+        },
+        {
+          "inputs": [],
+          "name": "BadPubKey",
+          "type": "error"
+        },
+        {
+          "inputs": [],
+          "name": "BadThreshold",
+          "type": "error"
+        },
+        {
+          "inputs": [],
+          "name": "BadTimes",
+          "type": "error"
+        },
+        {
+          "inputs": [],
+          "name": "CentreExists",
+          "type": "error"
+        },
+        {
+          "inputs": [],
+          "name": "CentreNotFound",
+          "type": "error"
+        },
+        {
+          "inputs": [],
+          "name": "CommitmentMismatch",
+          "type": "error"
+        },
+        {
+          "inputs": [],
+          "name": "ExamNotFound",
+          "type": "error"
+        },
+        {
+          "inputs": [],
+          "name": "LengthMismatch",
+          "type": "error"
+        },
+        {
+          "inputs": [],
+          "name": "NotAuthority",
+          "type": "error"
+        },
+        {
+          "inputs": [],
+          "name": "NotCustodian",
+          "type": "error"
+        },
+        {
+          "inputs": [],
+          "name": "RegistrationClosed",
+          "type": "error"
+        },
+        {
+          "inputs": [
+            {
+              "internalType": "uint64",
+              "name": "releaseTime",
+              "type": "uint64"
+            },
+            {
+              "internalType": "uint64",
+              "name": "nowTs",
+              "type": "uint64"
+            }
+          ],
+          "name": "ReleaseNotStarted",
+          "type": "error"
+        },
+        {
+          "inputs": [
+            {
+              "internalType": "uint64",
+              "name": "revealTime",
+              "type": "uint64"
+            },
+            {
+              "internalType": "uint64",
+              "name": "nowTs",
+              "type": "uint64"
+            }
+          ],
+          "name": "RevealNotStarted",
+          "type": "error"
+        },
+        {
+          "anonymous": false,
+          "inputs": [
+            {
+              "indexed": true,
+              "internalType": "uint256",
+              "name": "examId",
+              "type": "uint256"
+            },
+            {
+              "indexed": true,
+              "internalType": "uint32",
+              "name": "centreId",
+              "type": "uint32"
+            },
+            {
+              "indexed": false,
+              "internalType": "bytes32",
+              "name": "encPubKey",
+              "type": "bytes32"
+            },
+            {
+              "indexed": false,
+              "internalType": "bytes32",
+              "name": "variantCommitment",
+              "type": "bytes32"
+            },
+            {
+              "indexed": false,
+              "internalType": "bytes32",
+              "name": "fingerprintCommitment",
+              "type": "bytes32"
+            }
+          ],
+          "name": "CentreRegistered",
+          "type": "event"
+        },
+        {
+          "anonymous": false,
+          "inputs": [
+            {
+              "indexed": true,
+              "internalType": "uint256",
+              "name": "examId",
+              "type": "uint256"
+            },
+            {
+              "indexed": true,
+              "internalType": "uint32",
+              "name": "centreId",
+              "type": "uint32"
+            },
+            {
+              "indexed": false,
+              "internalType": "bytes32",
+              "name": "reasonHash",
+              "type": "bytes32"
+            }
+          ],
+          "name": "CentreRevoked",
+          "type": "event"
+        },
+        {
+          "anonymous": false,
+          "inputs": [
+            {
+              "indexed": true,
+              "internalType": "uint256",
+              "name": "examId",
+              "type": "uint256"
+            },
+            {
+              "indexed": true,
+              "internalType": "uint32",
+              "name": "centreId",
+              "type": "uint32"
+            },
+            {
+              "indexed": false,
+              "internalType": "bytes",
+              "name": "ciphertext",
+              "type": "bytes"
+            }
+          ],
+          "name": "EncryptedVariantPublished",
+          "type": "event"
+        },
+        {
+          "anonymous": false,
+          "inputs": [
+            {
+              "indexed": true,
+              "internalType": "uint256",
+              "name": "examId",
+              "type": "uint256"
+            },
+            {
+              "indexed": true,
+              "internalType": "address",
+              "name": "authority",
+              "type": "address"
+            },
+            {
+              "indexed": false,
+              "internalType": "string",
+              "name": "title",
+              "type": "string"
+            },
+            {
+              "indexed": false,
+              "internalType": "bytes32",
+              "name": "paperCommitment",
+              "type": "bytes32"
+            },
+            {
+              "indexed": false,
+              "internalType": "uint64",
+              "name": "releaseTime",
+              "type": "uint64"
+            },
+            {
+              "indexed": false,
+              "internalType": "uint64",
+              "name": "revealTime",
+              "type": "uint64"
+            },
+            {
+              "indexed": false,
+              "internalType": "uint8",
+              "name": "threshold",
+              "type": "uint8"
+            },
+            {
+              "indexed": false,
+              "internalType": "address[]",
+              "name": "custodians",
+              "type": "address[]"
+            }
+          ],
+          "name": "ExamCreated",
+          "type": "event"
+        },
+        {
+          "anonymous": false,
+          "inputs": [
+            {
+              "indexed": true,
+              "internalType": "uint256",
+              "name": "examId",
+              "type": "uint256"
+            },
+            {
+              "indexed": true,
+              "internalType": "uint32",
+              "name": "centreId",
+              "type": "uint32"
+            },
+            {
+              "indexed": false,
+              "internalType": "bytes",
+              "name": "fingerprint",
+              "type": "bytes"
+            }
+          ],
+          "name": "FingerprintRevealed",
+          "type": "event"
+        },
+        {
+          "anonymous": false,
+          "inputs": [
+            {
+              "indexed": true,
+              "internalType": "uint256",
+              "name": "examId",
+              "type": "uint256"
+            },
+            {
+              "indexed": true,
+              "internalType": "uint32",
+              "name": "centreId",
+              "type": "uint32"
+            },
+            {
+              "indexed": false,
+              "internalType": "bytes32",
+              "name": "evidenceHash",
+              "type": "bytes32"
+            },
+            {
+              "indexed": false,
+              "internalType": "uint16",
+              "name": "matched",
+              "type": "uint16"
+            },
+            {
+              "indexed": false,
+              "internalType": "uint16",
+              "name": "observed",
+              "type": "uint16"
+            }
+          ],
+          "name": "LeakRecorded",
+          "type": "event"
+        },
+        {
+          "anonymous": false,
+          "inputs": [
+            {
+              "indexed": true,
+              "internalType": "uint256",
+              "name": "examId",
+              "type": "uint256"
+            },
+            {
+              "indexed": true,
+              "internalType": "uint32",
+              "name": "centreId",
+              "type": "uint32"
+            },
+            {
+              "indexed": false,
+              "internalType": "uint64",
+              "name": "timestamp",
+              "type": "uint64"
+            }
+          ],
+          "name": "ReleaseAuthorized",
+          "type": "event"
+        },
+        {
+          "anonymous": false,
+          "inputs": [
+            {
+              "indexed": true,
+              "internalType": "uint256",
+              "name": "examId",
+              "type": "uint256"
+            },
+            {
+              "indexed": true,
+              "internalType": "uint32",
+              "name": "centreId",
+              "type": "uint32"
+            },
+            {
+              "indexed": true,
+              "internalType": "address",
+              "name": "custodian",
+              "type": "address"
+            },
+            {
+              "indexed": false,
+              "internalType": "bytes",
+              "name": "sealedShare",
+              "type": "bytes"
+            },
+            {
+              "indexed": false,
+              "internalType": "uint8",
+              "name": "approvals",
+              "type": "uint8"
+            }
+          ],
+          "name": "ShareReleased",
+          "type": "event"
+        },
+        {
+          "anonymous": false,
+          "inputs": [
+            {
+              "indexed": true,
+              "internalType": "uint256",
+              "name": "examId",
+              "type": "uint256"
+            },
+            {
+              "indexed": true,
+              "internalType": "uint32",
+              "name": "centreId",
+              "type": "uint32"
+            },
+            {
+              "indexed": true,
+              "internalType": "address",
+              "name": "custodian",
+              "type": "address"
+            },
+            {
+              "indexed": false,
+              "internalType": "uint8",
+              "name": "reason",
+              "type": "uint8"
+            }
+          ],
+          "name": "ShareSkipped",
+          "type": "event"
+        },
+        {
+          "inputs": [
+            {
+              "internalType": "string",
+              "name": "title",
+              "type": "string"
+            },
+            {
+              "internalType": "bytes32",
+              "name": "paperCommitment",
+              "type": "bytes32"
+            },
+            {
+              "internalType": "uint64",
+              "name": "releaseTime",
+              "type": "uint64"
+            },
+            {
+              "internalType": "uint64",
+              "name": "revealTime",
+              "type": "uint64"
+            },
+            {
+              "internalType": "address[]",
+              "name": "custodians",
+              "type": "address[]"
+            },
+            {
+              "internalType": "uint8",
+              "name": "threshold",
+              "type": "uint8"
+            }
+          ],
+          "name": "createExam",
+          "outputs": [
+            {
+              "internalType": "uint256",
+              "name": "examId",
+              "type": "uint256"
+            }
+          ],
+          "stateMutability": "nonpayable",
+          "type": "function"
+        },
+        {
+          "inputs": [
+            {
+              "internalType": "uint256",
+              "name": "examId",
+              "type": "uint256"
+            },
+            {
+              "internalType": "uint32",
+              "name": "centreId",
+              "type": "uint32"
+            }
+          ],
+          "name": "getCentre",
+          "outputs": [
+            {
+              "components": [
+                {
+                  "internalType": "enum IExamSealRegistry.CentreStatus",
+                  "name": "status",
+                  "type": "uint8"
+                },
+                {
+                  "internalType": "uint8",
+                  "name": "approvals",
+                  "type": "uint8"
+                },
+                {
+                  "internalType": "bytes32",
+                  "name": "encPubKey",
+                  "type": "bytes32"
+                },
+                {
+                  "internalType": "bytes32",
+                  "name": "variantCommitment",
+                  "type": "bytes32"
+                },
+                {
+                  "internalType": "bytes32",
+                  "name": "fingerprintCommitment",
+                  "type": "bytes32"
+                },
+                {
+                  "internalType": "uint64",
+                  "name": "registeredBlock",
+                  "type": "uint64"
+                },
+                {
+                  "internalType": "bool",
+                  "name": "fingerprintRevealed",
+                  "type": "bool"
+                },
+                {
+                  "internalType": "bytes32",
+                  "name": "lastEvidenceHash",
+                  "type": "bytes32"
+                }
+              ],
+              "internalType": "struct IExamSealRegistry.CentreView",
+              "name": "",
+              "type": "tuple"
+            }
+          ],
+          "stateMutability": "view",
+          "type": "function"
+        },
+        {
+          "inputs": [
+            {
+              "internalType": "uint256",
+              "name": "examId",
+              "type": "uint256"
+            }
+          ],
+          "name": "getCentreIds",
+          "outputs": [
+            {
+              "internalType": "uint32[]",
+              "name": "",
+              "type": "uint32[]"
+            }
+          ],
+          "stateMutability": "view",
+          "type": "function"
+        },
+        {
+          "inputs": [
+            {
+              "internalType": "uint256",
+              "name": "examId",
+              "type": "uint256"
+            }
+          ],
+          "name": "getExam",
+          "outputs": [
+            {
+              "components": [
+                {
+                  "internalType": "address",
+                  "name": "authority",
+                  "type": "address"
+                },
+                {
+                  "internalType": "string",
+                  "name": "title",
+                  "type": "string"
+                },
+                {
+                  "internalType": "bytes32",
+                  "name": "paperCommitment",
+                  "type": "bytes32"
+                },
+                {
+                  "internalType": "uint64",
+                  "name": "releaseTime",
+                  "type": "uint64"
+                },
+                {
+                  "internalType": "uint64",
+                  "name": "revealTime",
+                  "type": "uint64"
+                },
+                {
+                  "internalType": "uint8",
+                  "name": "threshold",
+                  "type": "uint8"
+                },
+                {
+                  "internalType": "uint32",
+                  "name": "centreCount",
+                  "type": "uint32"
+                },
+                {
+                  "internalType": "uint64",
+                  "name": "createdBlock",
+                  "type": "uint64"
+                },
+                {
+                  "internalType": "address[]",
+                  "name": "custodians",
+                  "type": "address[]"
+                }
+              ],
+              "internalType": "struct IExamSealRegistry.ExamView",
+              "name": "",
+              "type": "tuple"
+            }
+          ],
+          "stateMutability": "view",
+          "type": "function"
+        },
+        {
+          "inputs": [
+            {
+              "internalType": "uint256",
+              "name": "examId",
+              "type": "uint256"
+            },
+            {
+              "internalType": "uint32",
+              "name": "centreId",
+              "type": "uint32"
+            }
+          ],
+          "name": "getShares",
+          "outputs": [
+            {
+              "internalType": "address[]",
+              "name": "custodians",
+              "type": "address[]"
+            },
+            {
+              "internalType": "bytes[]",
+              "name": "sealedShares",
+              "type": "bytes[]"
+            }
+          ],
+          "stateMutability": "view",
+          "type": "function"
+        },
+        {
+          "inputs": [
+            {
+              "internalType": "uint256",
+              "name": "examId",
+              "type": "uint256"
+            },
+            {
+              "internalType": "uint32",
+              "name": "centreId",
+              "type": "uint32"
+            },
+            {
+              "internalType": "address",
+              "name": "custodian",
+              "type": "address"
+            }
+          ],
+          "name": "hasReleased",
+          "outputs": [
+            {
+              "internalType": "bool",
+              "name": "",
+              "type": "bool"
+            }
+          ],
+          "stateMutability": "view",
+          "type": "function"
+        },
+        {
+          "inputs": [],
+          "name": "nextExamId",
+          "outputs": [
+            {
+              "internalType": "uint256",
+              "name": "",
+              "type": "uint256"
+            }
+          ],
+          "stateMutability": "view",
+          "type": "function"
+        },
+        {
+          "inputs": [
+            {
+              "internalType": "uint256",
+              "name": "examId",
+              "type": "uint256"
+            },
+            {
+              "internalType": "uint32",
+              "name": "centreId",
+              "type": "uint32"
+            },
+            {
+              "internalType": "bytes32",
+              "name": "evidenceHash",
+              "type": "bytes32"
+            },
+            {
+              "internalType": "uint16",
+              "name": "matched",
+              "type": "uint16"
+            },
+            {
+              "internalType": "uint16",
+              "name": "observed",
+              "type": "uint16"
+            }
+          ],
+          "name": "recordLeak",
+          "outputs": [],
+          "stateMutability": "nonpayable",
+          "type": "function"
+        },
+        {
+          "inputs": [
+            {
+              "internalType": "uint256",
+              "name": "examId",
+              "type": "uint256"
+            },
+            {
+              "internalType": "uint32[]",
+              "name": "centreIds",
+              "type": "uint32[]"
+            },
+            {
+              "internalType": "bytes32[]",
+              "name": "encPubKeys",
+              "type": "bytes32[]"
+            },
+            {
+              "internalType": "bytes32[]",
+              "name": "fingerprintCommitments",
+              "type": "bytes32[]"
+            },
+            {
+              "internalType": "bytes[]",
+              "name": "variantCiphertexts",
+              "type": "bytes[]"
+            }
+          ],
+          "name": "registerCentres",
+          "outputs": [],
+          "stateMutability": "nonpayable",
+          "type": "function"
+        },
+        {
+          "inputs": [
+            {
+              "internalType": "uint256",
+              "name": "examId",
+              "type": "uint256"
+            },
+            {
+              "internalType": "uint32[]",
+              "name": "centreIds",
+              "type": "uint32[]"
+            },
+            {
+              "internalType": "bytes[]",
+              "name": "sealedShares",
+              "type": "bytes[]"
+            }
+          ],
+          "name": "releaseShares",
+          "outputs": [],
+          "stateMutability": "nonpayable",
+          "type": "function"
+        },
+        {
+          "inputs": [
+            {
+              "internalType": "uint256",
+              "name": "examId",
+              "type": "uint256"
+            },
+            {
+              "internalType": "uint32",
+              "name": "centreId",
+              "type": "uint32"
+            },
+            {
+              "internalType": "bytes",
+              "name": "fingerprint",
+              "type": "bytes"
+            },
+            {
+              "internalType": "bytes32",
+              "name": "salt",
+              "type": "bytes32"
+            }
+          ],
+          "name": "revealFingerprint",
+          "outputs": [],
+          "stateMutability": "nonpayable",
+          "type": "function"
+        },
+        {
+          "inputs": [
+            {
+              "internalType": "uint256",
+              "name": "examId",
+              "type": "uint256"
+            },
+            {
+              "internalType": "uint32",
+              "name": "centreId",
+              "type": "uint32"
+            },
+            {
+              "internalType": "bytes32",
+              "name": "reasonHash",
+              "type": "bytes32"
+            }
+          ],
+          "name": "revokeCentre",
+          "outputs": [],
+          "stateMutability": "nonpayable",
+          "type": "function"
+        }
+      ],
+      "constructorArguments": []
     }
   }
 } as const;
