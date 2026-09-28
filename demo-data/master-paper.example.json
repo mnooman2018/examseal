@@ -1,0 +1,27 @@
+{
+  "version": 1,
+  "title": "SNPSU B.Tech Semester Examination (Demo)",
+  "subject": "Computer Science Fundamentals",
+  "durationMinutes": 30,
+  "instructions": "Answer all questions. Each question carries one mark.",
+  "questions": [
+    {
+      "id": "Q01",
+      "wordings": [
+        "Which data structure follows the First-In-First-Out principle?",
+        "Which data structure processes its elements in First-In-First-Out order?"
+      ],
+      "options": ["Stack", "Queue", "Binary tree", "Hash table"],
+      "answerIndex": 1
+    },
+    {
+      "id": "Q02",
+      "wordings": [
+        "Which protocol translates domain names into IP addresses?",
+        "What service maps human-readable domain names to their numeric IP addresses?"
+      ],
+      "options": ["DNS", "DHCP", "FTP", "SMTP"],
+      "answerIndex": 0
+    }
+  ]
+}

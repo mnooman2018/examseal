@@ -15,6 +15,7 @@ packages:
 onlyBuiltDependencies:
   - bson
   - bufferutil
+  - esbuild
   - keccak
   - secp256k1
   - unrs-resolver
@@ -23,6 +24,7 @@ onlyBuiltDependencies:
 allowBuilds:
   bson: true
   bufferutil: true
+  esbuild: true
   keccak: true
   secp256k1: true
   unrs-resolver: true

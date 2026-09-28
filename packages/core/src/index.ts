@@ -8,4 +8,7 @@ export * from "./seal";
 export * from "./recover";
 export * from "./commit";
 export * from "./paper";
+export * from "./codebook";
+export * from "./variant";
 export * from "./forensic/types";
+export * from "./forensic/normalize";
