@@ -27,3 +27,9 @@ One entry per decision or new dependency: what, why, alternative rejected.
 - **What:** `zod@3.25.76` in `examseal-core`, holding `ExtractionSchema` and the §10 system prompt (`forensic/extraction.ts`).
 - **Why:** §10 requires zod validation of the extractor output. Keeping the schema and prompt in core means `ops check-extractor` and `/api/extract` use one copy.
 - **Rejected:** a hand-written validator (more code, easier to get wrong); zod 4 (newer API, no benefit for one schema).
+
+## D5: ops seed dependencies and local end-to-end test (H1)
+
+- **What:** `examseal-ops` now depends on `viem@2.56.9` (same version as core and frontend) and `examseal-shared` (registry address and ABI; never hand-copied). `scripts/e2e-local.ts` tests seed against a local Hardhat node.
+- **Why:** §2 says ops scripts use tsx + viem. The local test exercises the full lifecycle (early release rejected, 2/5 locked, 3/5 authorizes, all centres decrypt from on-chain data, reveal) without spending testnet funds or creating testnet exams.
+- **Rejected:** hand-writing the ABI in ops (could drift from the deployed contract); testing seed on testnet (would burn exam ids and faucet funds).

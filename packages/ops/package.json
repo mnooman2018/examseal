@@ -5,11 +5,14 @@
   "type": "module",
   "scripts": {
     "cli": "tsx src/cli.ts",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "e2e:local": "tsx scripts/e2e-local.ts"
   },
   "dependencies": {
     "dotenv": "16.6.1",
-    "examseal-core": "workspace:*"
+    "examseal-core": "workspace:*",
+    "examseal-shared": "workspace:*",
+    "viem": "2.56.9"
   },
   "devDependencies": {
     "@types/node": "^22.7.5",
