@@ -49,3 +49,21 @@ One entry per decision or new dependency: what, why, alternative rejected.
 - **Other limits found:** the free plan also caps **output at 1,000 tokens/minute**; a request with a larger `max_completion_tokens` is refused as "Request too large" (not retried). The cap is now 1,000 (a 12-question transcription is ~730 tokens), so at most about one Groq photo per minute.
 - **Caveats (said openly):** Groq marks this model **preview**, "may be discontinued at short notice". Right now Groq does **not** rescue a Gemini outage for us; it fails safely instead. The leaked photo is sent to a second third-party service when Gemini fails. The model only transcribes; matching stays deterministic and in the browser.
 - **Rejected:** other Groq models (no image input); a Groq SDK (extra dependency for one call).
+
+## D8: Matcher thresholds tuned by simulation (Phase 3)
+
+All numbers below come from `pnpm ops simulate` (1,000 trials per row: 6,000 real leaks with §10 noise and 7,000 fake leaks per seed, 5 exam codebooks × 20 centres, public seeds, never the demo codebook). "k" = visible questions; percentages are real leaks attributed to the correct centre.
+
+- **§10 defaults (85%, ≥ 4 features), seed v1:** MATCH-wrong 0 of 6,000 but **1 false match in 7,000**: a fake paper (k = 6, fake codebook 0, centre 18) attributed to real centre 8 at 8 of 9 features, runner-up 4. Target missed.
+- **Single changes on seed v1** (all reached 0 wrong / 0 false):
+  - C1 lead ≥ 5: k=3 20.4%, k=4 68.3%. Too costly.
+  - C2 match ≥ 90%: k=2 36.7%, k=3 83.0%, k=4 96.5%. Almost free.
+  - C3 ≥ 10 features: k=3 0%, k=4 52.5%. Too costly.
+- **C2 on held-out seeds:** v3 clean; **v2 had 1 false match**: a fake (k = 4, fake codebook 4, centre 19) attributed to real centre 3 at **7 of 7** features, runner-up 4. No percentage can stop a 100% agreement; the cause is thin evidence (7 features, several of them coin-flip wordings).
+- **Combinations on seeds v1, v2, v3** (all 0 wrong in 18,000, 0 false in 21,000):
+  - D1 90% + lead ≥ 4: k=2 ~7%, k=3 ~55%, k=4 88–91%.
+  - D2 90% + ≥ 8 features: k=2 0%, k=3 38–39%, k=4 92–94%.
+- **Chosen: D2** (`MIN_MATCH_PERCENT` 85 → 90, `MIN_OBSERVED_FEATURES` 4 → 8; lead unchanged). It is stronger where realistic partial leaks sit (k ≥ 4), and its rule is easy to state: never name a centre on fewer than 8 visible features. Cost: 2 visible questions are always INCONCLUSIVE, 3 are named about 4 times in 10.
+- **Held-out check of D2 on fresh seeds v4, v5** (not used for choosing): 0 wrong in 12,000, 0 false in 14,000; k=3 39.9% / 41.8%, k=4 94.7% / 94.5%. Across v1–v5: 0 wrong in 30,000 real leaks, 0 false matches in 35,000 fake leaks.
+- `MATCHER_VERSION` bumped to `examseal-matcher/2`; evidence reports record it, so exam 3's report (made with /1) stays verifiable.
+- **Rejected:** C1, C3 (large loss at k = 3–4); D1 (weaker at k = 4); changing the matcher algorithm itself (§10 fixes the method; only thresholds are tuned).
