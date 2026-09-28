@@ -23,6 +23,7 @@ import { centreLabel } from "@/lib/format";
 import { type CompressedPhoto, compressPhoto } from "./photo";
 import { parseCodebookFile, parseMasterPaperFile } from "./files";
 import { EvidencePanel, FeatureTable, RankingTable, ResultCard } from "./Result";
+import { Accountability } from "./Accountability";
 import styles from "./trace.module.css";
 
 export default function TracePage() {
@@ -249,6 +250,11 @@ function Trace() {
           )}
           {result.scores.length > 0 && result.observations.length > 0 && <RankingTable scores={result.scores} />}
           <EvidencePanel report={result.report} hash={result.hash} />
+          {exam && matchedCentre ? (
+            <Accountability exam={exam} centre={matchedCentre} decision={result.decision} evidence={result.hash} />
+          ) : (
+            <p className="muted">Evidence is recorded on MST only for a MATCH. An inconclusive photo is never attributed to a centre.</p>
+          )}
         </>
       )}
     </main>
