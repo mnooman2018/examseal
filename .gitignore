@@ -25,3 +25,8 @@ npm-debug.log*
 pnpm-debug.log*
 yarn-debug.log*
 yarn-error.log*
+
+# examseal secrets
+demo-data/secrets/
+*.secret.json
+.env.local
