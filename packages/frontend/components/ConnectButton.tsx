@@ -22,7 +22,7 @@ export function ConnectButton() {
     <div className="wallet">
       {connectors.map((connector) => (
         <button key={connector.uid} onClick={() => connect({ connector })} disabled={isPending}>
-          Connect {connector.name}
+          {connector.id === "injected" ? "Connect wallet" : `Connect ${connector.name}`}
         </button>
       ))}
     </div>

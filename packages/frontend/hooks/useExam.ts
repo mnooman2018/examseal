@@ -4,6 +4,7 @@ import { useQuery } from "@tanstack/react-query";
 import type { Address, Hex } from "viem";
 import { publicClient } from "@/lib/client";
 import { registry, POLL_MS, CENTRE_STATUS, type CentreStatusName } from "@/lib/registry";
+import { decodeRevert } from "@/lib/errors";
 
 export type Exam = {
   id: bigint;
@@ -73,7 +74,8 @@ export function useExam(examId: bigint | undefined) {
     queryFn: () => fetchExam(examId!),
     enabled: examId !== undefined && examId > 0n,
     refetchInterval: POLL_MS,
-    retry: 1,
+    // A contract revert (e.g. ExamNotFound) is deterministic: show it at once instead of retrying.
+    retry: (count, err) => decodeRevert(err) === null && count < 2,
   });
 }
 

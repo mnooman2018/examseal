@@ -1,6 +1,6 @@
 import { explainError } from "@/lib/errors";
 
-/** Plain-words error. When the chain is unreachable we say so; we never pretend. */
+/** Plain-words error for failed chain reads. When the chain is unreachable we say so; we never pretend. */
 export function ErrorBanner({
   title,
   error,
@@ -12,7 +12,7 @@ export function ErrorBanner({
   message?: string;
   onRetry?: () => void;
 }) {
-  const text = message ?? (error !== undefined && error !== null ? explainError(error) : "");
+  const text = message ?? (error !== undefined && error !== null ? explainError(error, { read: true }) : "");
   if (!text) return null;
   return (
     <div className="banner banner-bad" role="alert">

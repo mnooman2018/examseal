@@ -186,6 +186,9 @@ th { color: var(--ink-soft); font-weight: 600; }
 
 @media (max-width: 640px) {
   html { font-size: 15px; }
+  .site-header-row { justify-content: space-between; gap: 0.5rem; }
+  .nav { order: 3; flex-basis: 100%; overflow-x: auto; flex-wrap: nowrap; }
+  .nav a { white-space: nowrap; padding: 0.3rem 0.55rem; }
   .phase-strip { grid-template-columns: repeat(2, 1fr); }
   .centre-grid { grid-template-columns: repeat(auto-fill, minmax(120px, 1fr)); }
   .tl-item { grid-template-columns: 1fr; gap: 0.2rem; }

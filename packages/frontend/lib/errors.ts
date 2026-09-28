@@ -77,10 +77,12 @@ export function decodeRevert(err: unknown): DecodedRevert | null {
 /**
  * Turns any error into one sentence for the UI.
  * `mined` = the transaction was included in a block with status "reverted".
+ * `read`  = the error came from a view call, not a transaction.
  */
-export function explainError(err: unknown, opts: { mined?: boolean } = {}): string {
+export function explainError(err: unknown, opts: { mined?: boolean; read?: boolean } = {}): string {
   const r = decodeRevert(err);
   if (r) {
+    if (opts.read) return `The registry reports: ${describeRevert(r)}`;
     const tail = opts.mined ? " Your transaction was recorded as failed." : "";
     return `Rejected by the contract: ${describeRevert(r)}${tail}`;
   }

@@ -118,7 +118,7 @@ function CustodianConsole({ file }: { file: CustodianFile }) {
           <dt>Connected wallet</dt>
           <dd>{address ? <AddressLink address={address} /> : <span className="muted">not connected</span>}</dd>
           <dt>Pieces in file</dt>
-          <dd>{file.shares.length} centres</dd>
+          <dd>{file.shares.length} centre{file.shares.length === 1 ? "" : "s"}</dd>
         </dl>
         {exam && chainIndex < 0 && (
           <ErrorBanner message={`${file.custodianAddress} is not a custodian of exam #${file.examId} on-chain. This file does not match the exam.`} />
