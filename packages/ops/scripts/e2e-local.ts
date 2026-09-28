@@ -37,6 +37,7 @@ import {
 import { mnemonicToAccount } from "viem/accounts";
 import { registryAbi } from "../src/chain";
 import { EXAMPLE_PAPER, MASTER_PAPER, ROOT } from "../src/env";
+import { release as opsRelease } from "../src/release";
 import { seed } from "../src/seed";
 
 const RPC = process.env.E2E_RPC ?? "http://127.0.0.1:8545";
@@ -145,6 +146,11 @@ async function main() {
   }
   check(revertName === "ReleaseNotStarted", "early release reverts with ReleaseNotStarted");
 
+  const opsOpts = (n: number) => ({ examId, custodian: n, rpc: RPC, contract: registry, secretsRoot: outRoot });
+  const errorOf = async (p: Promise<unknown>) => p.then(() => "", (e: Error) => e.message);
+  check(/Release opens in \d+s/.test(await errorOf(opsRelease(opsOpts(4), dev(4)))), "ops release refuses before release time (no tx sent)");
+  check(/is for 0x/.test(await errorOf(opsRelease(opsOpts(4), dev(5)))), "ops release refuses a key that does not match the custodian file");
+
   await timeTravel(125);
   await release(0);
   await release(1);
@@ -188,9 +194,18 @@ async function main() {
   }
   check(true, "all 20 centres: ciphertext from a single-block log matches the on-chain commitment, 3 pieces decrypt, paper equals the seeded variant");
 
-  await release(3);
+  // Revoke centre 20 first: ops release must leave it out of the tx.
+  const revokeTx = await walletFor(0).writeContract({ address: registry, abi: registryAbi, functionName: "revokeCentre", args: [examId, 20, keccak256("0x01")] });
+  await pc.waitForTransactionReceipt({ hash: revokeTx });
+  const r4 = await opsRelease(opsOpts(4), dev(4));
   c14 = await read<CentreView>("getCentre", [examId, 14]);
-  check(c14.approvals === 4, "a spare 4th piece (scripted custodian 4) is accepted");
+  check(r4.tx && r4.released.length === 19 && c14.approvals === 4, "ops release --custodian 4 releases 19 pieces in one tx (centre 14 at 4/5)");
+  check(r4.skipped.length === 1 && r4.skipped[0].centreId === 20 && r4.skipped[0].reason === 1, "ops release leaves revoked centre 20 out of the tx");
+  const r5 = await opsRelease(opsOpts(5), dev(5));
+  c14 = await read<CentreView>("getCentre", [examId, 14]);
+  check(r5.tx && c14.approvals === 5 && c14.status === 2, "ops release --custodian 5 brings centre 14 to 5/5");
+  const again = await opsRelease(opsOpts(4), dev(4));
+  check(again.tx === null && again.skipped.length === 20, "re-running ops release for custodian 4 sends nothing");
 
   // fingerprints reveal against the on-chain commitments
   await timeTravel(65);

@@ -17,6 +17,9 @@ Commands:
   seed [--centres 20] [--release-in 150] [--reveal-after 120] [--dry-run]
       Create a demo exam on MST Testnet (§12) and write its secret files to
       demo-data/secrets/exam-<id>/. --dry-run checks everything and sends nothing.
+  release --exam <id> --custodian 4[,5] [--wait]
+      Release scripted custodian 4 and/or 5's pieces for every centre (one tx each).
+      Refuses before release time unless --wait (waits in chain time, then sends).
 `;
 
 async function main(argv: string[]): Promise<number> {
@@ -39,6 +42,9 @@ async function main(argv: string[]): Promise<number> {
       rpc: { type: "string" },
       contract: { type: "string" },
       "out-root": { type: "string" },
+      custodian: { type: "string" },
+      wait: { type: "boolean" },
+      "secrets-root": { type: "string" },
     },
   });
   switch (command) {
@@ -66,6 +72,24 @@ async function main(argv: string[]): Promise<number> {
         configFromEnv(),
       );
       return r || values["dry-run"] ? 0 : 1;
+    }
+    case "release": {
+      const { release, custodianAccountFromEnv, parseCustodianList } = await import("./release");
+      if (!values.exam || !/^\d+$/.test(values.exam)) throw new UserError("--exam <id> is required, e.g. --exam 3");
+      for (const n of parseCustodianList(values.custodian)) {
+        await release(
+          {
+            examId: BigInt(values.exam),
+            custodian: n,
+            wait: values.wait,
+            rpc: values.rpc,
+            contract: values.contract,
+            secretsRoot: values["secrets-root"],
+          },
+          custodianAccountFromEnv(n),
+        );
+      }
+      return 0;
     }
     default:
       console.log(USAGE);
