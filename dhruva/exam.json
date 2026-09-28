@@ -1,0 +1,177 @@
+{
+    "version": 1,
+    "title": "SNPSU B.Tech Semester Examination (Demo)",
+    "subject": "Computer Science Fundamentals",
+    "durationMinutes": 30,
+    "instructions": "Answer all questions. Each question carries one mark.",
+    "questions": [
+        {
+            "id": "Q01",
+            "wordings": [
+                "Which data structure follows the First-In-First-Out principle?",
+                "Which data structure processes its elements in First-In-First-Out order?"
+            ],
+            "options": [
+                "Stack",
+                "Queue",
+                "Binary tree",
+                "Hash table"
+            ],
+            "answerIndex": 1
+        },
+        {
+            "id": "Q02",
+            "wordings": [
+                "Which operating system component manages hardware resources and system operations?",
+                "Which core part of an operating system controls hardware resources and operations?"
+            ],
+            "options": [
+                "Compiler",
+                "Kernel",
+                "Browser",
+                "Editor"
+            ],
+            "answerIndex": 1
+        },
+        {
+            "id": "Q03",
+            "wordings": [
+                "Which network device forwards packets between different computer networks?",
+                "Which networking device directs data packets across separate computer networks?"
+            ],
+            "options": [
+                "Router",
+                "Repeater",
+                "Hub",
+                "Modem"
+            ],
+            "answerIndex": 0
+        },
+        {
+            "id": "Q04",
+            "wordings": [
+                "Which database key uniquely identifies each record in a table?",
+                "Which type of database key provides a unique identity for every table record?"
+            ],
+            "options": [
+                "Foreign key",
+                "Composite key",
+                "Primary key",
+                "Secondary key"
+            ],
+            "answerIndex": 2
+        },
+        {
+            "id": "Q05",
+            "wordings": [
+                "Which algorithm searches a sorted array by repeatedly dividing the search interval?",
+                "Which searching technique repeatedly halves a sorted array to locate an element?"
+            ],
+            "options": [
+                "Linear search",
+                "Depth-first search",
+                "Breadth-first search",
+                "Binary search"
+            ],
+            "answerIndex": 3
+        },
+        {
+            "id": "Q06",
+            "wordings": [
+                "Which OOP concept allows a class to acquire properties of another class?",
+                "Which object-oriented feature enables one class to obtain characteristics from another class?"
+            ],
+            "options": [
+                "Encapsulation",
+                "Inheritance",
+                "Abstraction",
+                "Polymorphism"
+            ],
+            "answerIndex": 1
+        },
+        {
+            "id": "Q07",
+            "wordings": [
+                "Which computer component performs arithmetic and logical operations on data?",
+                "Which processor unit is responsible for carrying out arithmetic and logical operations?"
+            ],
+            "options": [
+                "Control unit",
+                "Cache memory",
+                "ALU",
+                "Register"
+            ],
+            "answerIndex": 2
+        },
+        {
+            "id": "Q08",
+            "wordings": [
+                "Which software translates an entire high-level program into machine code before execution?",
+                "Which translator converts a complete high-level program to machine code prior to execution?"
+            ],
+            "options": [
+                "Compiler",
+                "Interpreter",
+                "Debugger",
+                "Assembler"
+            ],
+            "answerIndex": 0
+        },
+        {
+            "id": "Q09",
+            "wordings": [
+                "Which number system uses only the digits zero and one?",
+                "Which numeral system represents values using exclusively zero and one?"
+            ],
+            "options": [
+                "Decimal",
+                "Octal",
+                "Hexadecimal",
+                "Binary"
+            ],
+            "answerIndex": 3
+        },
+        {
+            "id": "Q10",
+            "wordings": [
+                "Which protocol is primarily used to transfer web pages over the Internet?",
+                "Which communication protocol is commonly responsible for transferring web pages online?"
+            ],
+            "options": [
+                "FTP",
+                "HTTP",
+                "SMTP",
+                "SSH"
+            ],
+            "answerIndex": 1
+        },
+        {
+            "id": "Q11",
+            "wordings": [
+                "Which type of memory loses its stored data when electrical power is removed?",
+                "Which memory category cannot retain stored information after power is switched off?"
+            ],
+            "options": [
+                "ROM",
+                "Flash memory",
+                "RAM",
+                "Hard disk"
+            ],
+            "answerIndex": 2
+        },
+        {
+            "id": "Q12",
+            "wordings": [
+                "Which software development model follows a sequential series of defined development phases?",
+                "Which development methodology progresses through predefined software phases in sequential order?"
+            ],
+            "options": [
+                "Waterfall model",
+                "Agile model",
+                "Spiral model",
+                "Prototype model"
+            ],
+            "answerIndex": 0
+        }
+    ]
+}
