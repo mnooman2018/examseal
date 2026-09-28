@@ -539,6 +539,8 @@ export function buildEvidenceReport(args: Omit<EvidenceReport, "version" | "matc
 - `gemini`: fallback if there's no Anthropic API key. Check the current free-tier vision model name before using it.
 - `manual`: paste a transcription instead of a photo. The UI **must** show a "Manual transcription" badge, and this mode is **never** presented as AI in the demo.
 
+> **In use: `EXTRACTOR_PROVIDER=gemini`** (decided at H0; we have no Anthropic API credits). Model `gemini-3.8-flash` via the REST `generateContent` endpoint, temperature 0, same §10 prompt, output validated with zod. Env names: `GEMINI_API_KEY` (server only: `.env.local` and Vercel) and optional `GEMINI_MODEL` to override the model. Details in `docs/DECISIONS.md` (D1).
+
 **Extraction prompt (system):**
 ```
 You transcribe printed exam question papers from photos. Output ONLY a JSON object, no prose, no code fences:
