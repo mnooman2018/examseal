@@ -32,6 +32,11 @@ Owner: Sampurna. Updated at every gate.
 
 Phase 4 stretch goals (/verify, backup set, create-exam wizard) are **cut** unless G4 is green well before 07:00 (§4: "shrink Phase 4 first"). The never-cut list in §4 is unchanged.
 
+## For Nooman (morning)
+
+- **`/digital` needs a header link.** The new digital exam page (D9, approved by Sampurna for your review) is merged to `main` but is only reachable by URL, because adding it to the nav would edit your `components/SiteHeader.tsx`. Please add a "Digital" entry to `NAV` there (and review `app/digital/page.tsx`, which only imports your hooks, `lib/*` and components; nothing of yours was changed).
+- **Redeploy Vercel** from `main` so the hosted site gets `/digital` and the new `/trace` (paste leaked text, seat-level results). Needs to happen before the 07:00 feature freeze or be counted as a bug-fix deploy before the 10:00 code freeze.
+
 ## G4 plan (checked 02:25)
 
 §13 rows in `docs/QA.md` already PASS: 1, 2, 3, 13, 14 (iPhone), 16, 17, 18. Hosted-site machine checks PASS (see log 02:25). Remaining:
@@ -96,3 +101,4 @@ For each photo in `demo-data/leaks/`: `/trace?exam=4` → load the master paper 
 - 02:25 G4 machine checks against https://examseal-one.vercel.app: all pages 200; RPC proxy on chain 91562037; /api/extract rejects bad bodies (400), extra fields (400) and cross-origin (403); a real photo transcribed on the hosted site with Vercel's keys (Gemini gemini-3.8-flash, 11.5 s, 12/12 questions agree with the local transcription). Fix on branch sampurna/g4-fixes: ops scripts prefer IPv4 (Node fetch hit ECONNRESET over IPv6 on this laptop).
 - 02:28: sampurna/g4-fixes (ops prefer IPv4) merged to main; pnpm test and pnpm build green. QA row 5 on-chain proof skipped by decision: contract test "compromised → skipped(1)" covers it.
 - **G3 done (verified on-chain):** Adithi, with the authority wallet 0xC028…E0Ef, recorded the evidence for exam 3 Centre 14 in block 5791620 (36/36, evidence hash 0x78c3cf08…509dbb, equal to the centre's stored lastEvidenceHash) — https://testnet.mstscan.com/tx/0xc883875bc4db86b1137eee12dfa10dbdcf75c24dc9002a94a436c5aee85a7f7c — and revoked Centre 14 in block 5791631 — https://testnet.mstscan.com/tx/0xc615bec80396f70ec08e07efd8502514017573f4775e32fd58f19de477051d38. Centre 14 is now Compromised (5/5). QA row 19 can be marked PASS with the first link.
+- 03:20: sampurna/digital (D9 stretch: seat-level tracing, pasted-text leaks, /digital) merged to main after pnpm test (124 core, 29 contract) and pnpm build passed. Live test by Sampurna: text pasted from /digital seat 7 on exam 4 traced to "Centre 14, Seat 7" (36 of 36); the old printed photo still traces to Centre 14 on exam 3.
