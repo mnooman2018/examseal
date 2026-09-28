@@ -1,0 +1,19 @@
+{
+  "name": "examseal-ops",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "cli": "tsx src/cli.ts",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "dotenv": "16.6.1",
+    "examseal-core": "workspace:*"
+  },
+  "devDependencies": {
+    "@types/node": "^22.7.5",
+    "tsx": "4.23.15",
+    "typescript": "^5.5.4"
+  }
+}

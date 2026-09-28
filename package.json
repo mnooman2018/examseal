@@ -15,7 +15,8 @@
     "deploy:mainnet": "turbo run deploy:mainnet",
     "verify:testnet": "turbo run verify:testnet",
     "verify:mainnet": "turbo run verify:mainnet",
-    "clean": "turbo run clean"
+    "clean": "turbo run clean",
+    "ops": "pnpm --filter examseal-ops run cli"
   },
   "devDependencies": {
     "turbo": "^2.1.3"
