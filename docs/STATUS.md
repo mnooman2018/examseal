@@ -13,7 +13,7 @@ Owner: Sampurna. Updated at every gate.
 | G0 | H1 | 22:43 (28 Sep) | A real testnet transaction from our repo; BridgeKey signing on localhost | **Done** (Nooman) |
 | G1 | H4 | 01:43 (29 Sep) | `ExamSealRegistry` deployed and verified on testnet; all contract tests green | **Done** (merged to main 39d459c) |
 | G2 | H4–H5 | 01:43–02:43 | Core round trip (encrypt → split → seal → open any 3 → decrypt); 2 pieces fail; TS commitments equal Solidity | **Done** (65 core tests incl. Solidity cross-check) |
-| G3 | H10 | 07:43 | MVP end to end on testnet (seed → rejected early release → 3 releases → decrypt → trace → evidence → revoke). If this slips past H12 (09:43), apply the cut list | **Partly done.** Missing on-chain: record evidence + revoke (see log, 02:25) |
+| G3 | H10 | 07:43 | MVP end to end on testnet (seed → rejected early release → 3 releases → decrypt → trace → evidence → revoke). If this slips past H12 (09:43), apply the cut list | **Done** (exam 3, Centre 14; evidence + revoke verified on-chain, see log) |
 | G4 | – | **07:00** | Public link works on a phone; attack checklist (§13) passes **on the hosted site**. **Feature freeze** | Pending |
 | Code freeze | – | **10:00** | No code changes after this. Tag `v1.0`, final Vercel deploy, `pnpm test` and `pnpm build` green on `main` | Pending |
 | G5 | – | **11:00** | Demo video recorded on the frozen v1.0 deploy; README complete (§14 checklist) | Pending |
@@ -36,7 +36,7 @@ Phase 4 stretch goals (/verify, backup set, create-exam wizard) are **cut** unle
 
 §13 rows in `docs/QA.md` already PASS: 1, 2, 3, 13, 14 (iPhone), 16, 17, 18. Hosted-site machine checks PASS (see log 02:25). Remaining:
 
-**A. Finish G3 + QA rows 19 and 5: before 07:00, whoever holds the Authority BridgeKey profile**
+**A. Finish G3 + QA rows 19 and 5: DONE (verified on-chain; see log).** Step 7 (DO NOT USE banner on `/centre`) is still a human check.
 1. Chrome "Authority" profile. The connected wallet must be **0xC028f228E2B0697d0EaA63f4C818de205c1fE0Ef** (exam 3's authority; `/trace` step 1 shows it).
 2. Open https://examseal-one.vercel.app/trace?exam=3. Load `demo-data/master-paper.json`, then `demo-data/secrets/exam-3/codebook.secret.json`.
 3. Choose a Centre 14 photo (`C:Dev	race-test.png` works) → **Transcribe the photo** → expect "Leak traced to Centre 14".
@@ -95,3 +95,4 @@ For each photo in `demo-data/leaks/`: `/trace?exam=4` → load the master paper 
 - Phase 3: `ops simulate` run; `docs/SIMULATION.md` written. Thresholds tuned from it (D8): 0 wrong of 6,000 real leaks, 0 false matches of 7,000 fake leaks on the published run.
 - 02:25 G4 machine checks against https://examseal-one.vercel.app: all pages 200; RPC proxy on chain 91562037; /api/extract rejects bad bodies (400), extra fields (400) and cross-origin (403); a real photo transcribed on the hosted site with Vercel's keys (Gemini gemini-3.8-flash, 11.5 s, 12/12 questions agree with the local transcription). Fix on branch sampurna/g4-fixes: ops scripts prefer IPv4 (Node fetch hit ECONNRESET over IPv6 on this laptop).
 - 02:28: sampurna/g4-fixes (ops prefer IPv4) merged to main; pnpm test and pnpm build green. QA row 5 on-chain proof skipped by decision: contract test "compromised → skipped(1)" covers it.
+- **G3 done (verified on-chain):** Adithi, with the authority wallet 0xC028…E0Ef, recorded the evidence for exam 3 Centre 14 in block 5791620 (36/36, evidence hash 0x78c3cf08…509dbb, equal to the centre's stored lastEvidenceHash) — https://testnet.mstscan.com/tx/0xc883875bc4db86b1137eee12dfa10dbdcf75c24dc9002a94a436c5aee85a7f7c — and revoked Centre 14 in block 5791631 — https://testnet.mstscan.com/tx/0xc615bec80396f70ec08e07efd8502514017573f4775e32fd58f19de477051d38. Centre 14 is now Compromised (5/5). QA row 19 can be marked PASS with the first link.
