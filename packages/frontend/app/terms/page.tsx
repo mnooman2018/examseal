@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { SITE } from "@/lib/site";
+import { SITE, TEAM_NAMES } from "@/lib/site";
 import { registry } from "@/lib/registry";
 
 export const metadata: Metadata = {
@@ -19,7 +19,7 @@ export default function TermsPage() {
       <section>
         <h2>1. What this site is</h2>
         <p>
-          ExamSeal is a demonstration built by {SITE.team.join(", ")} for the MST Blockchain × Newrro buildathon. It shows how exam
+          ExamSeal is a demonstration built by {TEAM_NAMES} for the MST Blockchain × Newrro buildathon. It shows how exam
           papers can be sealed so that no single person can open them early, and how a leaked copy can be traced back to the centre
           it came from. It is a prototype, not a product or a service.
         </p>

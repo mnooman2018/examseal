@@ -12,5 +12,8 @@ export const SITE = {
   team: ["Sampurna", "Nooman", "Adithi", "Dhruva"],
 } as const;
 
+/** "Sampurna, Nooman, Adithi and Dhruva". */
+export const TEAM_NAMES = `${SITE.team.slice(0, -1).join(", ")} and ${SITE.team[SITE.team.length - 1]}`;
+
 /** Colours shared by the icon and Open Graph image (same values as globals.css). */
 export const BRAND = { slate: "#0f1419", ink: "#e6ebee", soft: "#95a3ad", line: "#2a3540" } as const;

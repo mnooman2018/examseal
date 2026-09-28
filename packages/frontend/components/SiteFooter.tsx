@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { SITE } from "@/lib/site";
+import { SITE, TEAM_NAMES } from "@/lib/site";
 import { registry } from "@/lib/registry";
 import { shortHex } from "@/lib/format";
 
@@ -18,7 +18,7 @@ export function SiteFooter() {
           </a>
         </nav>
         <div className="muted small">
-          Built on MST Blockchain. Demo on MST Testnet only. Team: {SITE.team.join(", ")}.
+          Built on MST Blockchain. Demo on MST Testnet only. Team: {TEAM_NAMES}.
         </div>
       </div>
     </footer>
