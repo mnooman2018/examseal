@@ -99,23 +99,30 @@ export type Phase = "Sealed" | "Awaiting release" | "Released" | "Compromised";
 
 /**
  * Overall phase for the phase strip, derived only from chain data:
- * Compromised if any centre is revoked; Released once every centre is released;
- * Awaiting release once chain time passes releaseTime; otherwise Sealed.
+ * Compromised if any centre is revoked; Released as soon as at least one centre has reached
+ * the threshold (it never falls back); Awaiting release once chain time passes releaseTime;
+ * otherwise Sealed.
  */
 export function examPhase(exam: Exam, centres: Centre[], now: number | undefined): Phase {
   if (centres.some((c) => c.status === "Compromised")) return "Compromised";
-  if (centres.length > 0 && centres.every((c) => c.status === "Released")) return "Released";
+  if (centres.some((c) => c.status === "Released")) return "Released";
   if (now !== undefined && now >= exam.releaseTime) return "Awaiting release";
   return "Sealed";
 }
 
+export type PhaseDisplay = { label: string; detail?: string };
+
 /**
- * Display label for the current phase. Once release is open but no centre has reached the
- * threshold yet, "Awaiting release" reads as "Release open, awaiting custodians".
+ * Text for the current phase step:
+ * - Awaiting release (release open, no centre at threshold yet) → "Release open, awaiting custodians"
+ * - Released while some non-compromised centres are still below threshold → count line, e.g. "3 of 20 centres released"
  */
-export function phaseLabel(phase: Phase, exam: Exam, centres: Centre[]): string {
-  if (phase === "Awaiting release" && !centres.some((c) => c.approvals >= exam.threshold)) {
-    return "Release open, awaiting custodians";
+export function phaseDisplay(phase: Phase, centres: Centre[]): PhaseDisplay {
+  if (phase === "Awaiting release") return { label: "Release open, awaiting custodians" };
+  if (phase === "Released") {
+    const released = centres.filter((c) => c.status === "Released").length;
+    const eligible = centres.filter((c) => c.status !== "Compromised").length;
+    return released < eligible ? { label: phase, detail: `${released} of ${eligible} centres released` } : { label: phase };
   }
-  return phase;
+  return { label: phase };
 }

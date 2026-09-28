@@ -3,7 +3,7 @@
 import { Suspense, useState } from "react";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
-import { examPhase, phaseLabel, parseExamId, useExam, useLatestExamId } from "@/hooks/useExam";
+import { examPhase, phaseDisplay, parseExamId, useExam, useLatestExamId } from "@/hooks/useExam";
 import { useChainTime } from "@/hooks/useChainTime";
 import { PhaseStrip } from "@/components/PhaseStrip";
 import { ChainCountdown } from "@/components/ChainCountdown";
@@ -64,7 +64,7 @@ function ControlRoom() {
 
       {exam && (
         <>
-          <PhaseStrip phase={phase} label={phaseLabel(phase, exam, centres)} />
+          <PhaseStrip phase={phase} display={phaseDisplay(phase, centres)} />
 
           <div className="grid-2">
             <div className="panel">

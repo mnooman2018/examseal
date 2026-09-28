@@ -4,7 +4,7 @@ import { useMemo, useState } from "react";
 import Link from "next/link";
 import { useAccount } from "wagmi";
 import { keccak256, toBytes } from "viem";
-import { examPhase, phaseLabel, parseExamId, useExam, type Centre, type Exam } from "@/hooks/useExam";
+import { examPhase, phaseDisplay, parseExamId, useExam, type Centre, type Exam } from "@/hooks/useExam";
 import { useChainTime } from "@/hooks/useChainTime";
 import { useCustodyEvents } from "@/hooks/useCustodyEvents";
 import { useTxFlow } from "@/hooks/useTxFlow";
@@ -47,10 +47,7 @@ export default function ExamPage({ params }: { params: { id: string } }) {
 
       {exam && (
         <>
-          <PhaseStrip
-            phase={examPhase(exam, centres, chain.now)}
-            label={phaseLabel(examPhase(exam, centres, chain.now), exam, centres)}
-          />
+          <PhaseStrip phase={examPhase(exam, centres, chain.now)} display={phaseDisplay(examPhase(exam, centres, chain.now), centres)} />
 
           <div className="grid-2">
             <section className="panel">
