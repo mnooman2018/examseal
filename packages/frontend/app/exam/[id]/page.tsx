@@ -42,7 +42,7 @@ export default function ExamPage({ params }: { params: { id: string } }) {
       <div className="muted small">
         <Link href={`/?exam=${examId}`}>← Control room</Link> · EXAM #{examId.toString()}
       </div>
-      <h1>{exam?.title ?? (isLoading ? "Reading exam from chain…" : "—")}</h1>
+      <h1>{exam?.title ?? (isLoading ? "Reading exam from chain…" : "Exam not available")}</h1>
       {error ? <ErrorBanner title={`Could not read exam #${examId}`} error={error} onRetry={() => refetch()} /> : null}
 
       {exam && (
