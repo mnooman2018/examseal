@@ -20,7 +20,7 @@
 | 11 | Leak photo 6 | Identified as Centre 14 | NOT TESTED | |
 | 12 | Fake leak photo 7 | INCONCLUSIVE | NOT TESTED | |
 | 13 | Refresh during flow | State recovers from blockchain | NOT TESTED | |
-| 14 | Phone view | Usable | NOT TESTED | |
+| 14 | Phone view | Usable | PASS | Tested on iPhone |
 | 15 | Projector view | Readable | NOT TESTED | |
 | 16 | Explorer links | Each link opens the correct MSTScan transaction | NOT TESTED | |
 | 17 | Three custodians released | 3/5 reached; RELEASE AUTHORIZED | NOT TESTED | |
@@ -78,3 +78,8 @@ Observed release state:
 The Centre 14 paper was successfully decrypted in the browser after the decryption module was deployed.
 
 Status: PASS
+
+## QA Status Notes
+
+- Phone view: **PASS** — tested on iPhone.
+- Projector view: **NOT TESTED** — this is the remaining display check.
