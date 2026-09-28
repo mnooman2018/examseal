@@ -120,6 +120,8 @@ async function main() {
   check(c0.shares.length === 20 && c0.shares.every((s) => (s.sealedShare.length - 2) / 2 === 93), "each custodian file holds 20 sealed pieces of 93 bytes");
   const summary = readJsonFile<{ status: string }>(path.join(dir, "summary.json"));
   check(summary.status === "sealed", "summary.json status is sealed");
+  const cands = readJsonFile<{ candidates: { centreId: number; seat: number }[]; seats: number[] }>(path.join(dir, "candidates.secret.json"));
+  check(cands.candidates.length === 20 * 30 && cands.seats.length === 30, "seed also wrote candidates.secret.json (20 centres × 30 seats, D9)");
 
   // on-chain state after seed
   const exam = await read<{ threshold: number; centreCount: number; custodians: readonly string[] }>("getExam", [examId]);

@@ -25,6 +25,7 @@ import {
 } from "examseal-core";
 import { type Address, type Hash, type LocalAccount, getAddress, isAddress, parseEventLogs } from "viem";
 import { privateKeyToAccount } from "viem/accounts";
+import { DEFAULT_SEATS, buildCandidates, writeCandidatesFile } from "./candidates";
 import { type Conn, chainTime, confirm, connect, jsonStringify, registryAbi, wallet } from "./chain";
 import { ROOT, UserError, loadEnv, readJson, rel, resolvePaperPath, secret32, userPath } from "./env";
 
@@ -284,6 +285,14 @@ export async function seed(opts: SeedOpts, cfg: SeedConfig): Promise<SeedResult 
   const dir = path.join(outRoot, `exam-${examId}`);
   if (existsSync(dir)) throw new UserError(`${dir} already exists; refusing to overwrite secrets`);
   writeSecrets(dir, { examId, contract: conn.registry, custodians: cfg.custodians, codebookSeed: cfg.codebookSeed, paperSalt, paperCommitment: paperCommit }, centres);
+  // Seat variants for digital exams (D9). Never allowed to break a seed: `ops candidates` can redo it.
+  try {
+    const seats = Array.from({ length: DEFAULT_SEATS }, (_, i) => i + 1);
+    const sks = new Map(centres.map((c) => [c.centreId, c.privateKey] as const));
+    writeCandidatesFile(dir, examId.toString(), buildCandidates(master, centres.map((c) => c.code), sks, seats), seats);
+  } catch (e) {
+    console.warn(`  WARNING: seat variants not written (${(e as Error).message}); run \`pnpm ops candidates --exam ${examId}\` later.`);
+  }
   const summary = {
     status: "registering" as string,
     examId,
