@@ -31,3 +31,10 @@ export const MIN_MATCH_PERCENT = 90;
 /** decide: best must lead the runner-up by at least max(MIN_LEAD, ceil(LEAD_FRACTION_PERCENT% × observed)) (§10 default). */
 export const MIN_LEAD = 3;
 export const LEAD_FRACTION_PERCENT = 30;
+
+/**
+ * Seat attribution (D9): the best seat must lead both the next seat and the centre's printed copy by
+ * at least this many features. Initial value; `ops simulate` measures seat attribution and D9 records
+ * the value it justifies.
+ */
+export const SEAT_MIN_LEAD = 2;
