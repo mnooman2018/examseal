@@ -449,3 +449,12 @@ input, select, textarea { border-radius: 6px; }
 .legal ul { padding-left: 1.2rem; margin: 0.2rem 0 0; }
 .legal li { margin: 0.4rem 0; }
 .legal a { color: var(--ink); text-decoration: underline; text-underline-offset: 2px; }
+
+/* ---------- leak radar (flat colours, no gradients) ---------- */
+@keyframes radar-flash {
+  0%, 100% { background-color: rgba(255, 77, 79, 0.12); box-shadow: 0 0 0 1px rgba(255, 77, 79, 0.4); }
+  50% { background-color: rgba(255, 77, 79, 0.55); box-shadow: 0 0 0 2px var(--red); }
+}
+.radar-flash { animation: radar-flash 0.6s ease-in-out 5; border-left-color: var(--red); }
+.radar-row-new td:first-child { box-shadow: inset 3px 0 0 var(--red); }
+.radar-grid { grid-template-columns: repeat(auto-fill, minmax(155px, 1fr)); }

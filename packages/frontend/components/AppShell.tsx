@@ -16,7 +16,7 @@ import { parseExamId, useLatestExamId } from "@/hooks/useExam";
 import { useChainTime } from "@/hooks/useChainTime";
 import { SITE, TEAM_NAMES } from "@/lib/site";
 
-type IconName = "grid" | "key" | "building" | "monitor" | "search" | "clock" | "cube" | "pulse" | "bars" | "shield";
+type IconName = "grid" | "key" | "building" | "monitor" | "search" | "clock" | "cube" | "pulse" | "bars" | "shield" | "radar";
 
 /** Small line icons (24×24, stroke = currentColor). */
 export function Icon({ name, size = 18 }: { name: IconName; size?: number }) {
@@ -85,6 +85,15 @@ export function Icon({ name, size = 18 }: { name: IconName; size?: number }) {
           <path d="M9 12l2 2 4-4" />
         </svg>
       );
+    case "radar":
+      return (
+        <svg {...common}>
+          <circle cx="12" cy="12" r="9" />
+          <circle cx="12" cy="12" r="5" />
+          <path d="M12 12l6-6" />
+          <circle cx="12" cy="12" r="1" />
+        </svg>
+      );
     case "cube":
       return (
         <svg {...common}>
@@ -103,6 +112,7 @@ const NAV: NavItem[] = [
   { label: "Centre", icon: "building", href: () => "/centre", active: (p) => p.startsWith("/centre") },
   { label: "Digital", icon: "monitor", href: () => "/digital", active: (p) => p.startsWith("/digital") },
   { label: "Trace", icon: "search", href: (e) => (e ? `/trace?exam=${e}` : "/trace"), active: (p) => p.startsWith("/trace") },
+  { label: "Leak Radar", icon: "radar", href: () => "/radar", active: (p) => p.startsWith("/radar") },
   { label: "Exam Timeline", icon: "clock", href: (e) => (e ? `/exam/${e}` : "/"), active: (p) => p.startsWith("/exam/") },
 ];
 
