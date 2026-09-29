@@ -438,4 +438,4 @@ input, select, textarea { border-radius: 8px; }
 .kpi-badge { width: 46px; height: 46px; }
 .kpi-badge svg { width: 22px; height: 22px; }
 /* D13: status value in Title Case (fits beside the badge; long text wraps between words, never mid-word). */
-.kpi-value-display { text-transform: none; overflow-wrap: normal; word-break: normal; font-size: 1.45rem; }
+.kpi-value-display { text-transform: none; overflow-wrap: normal; word-break: normal; font-size: 1.2rem; }
