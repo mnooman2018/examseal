@@ -18,7 +18,7 @@
 | 9 | Leak photo 4 | Identified as Centre 14 | PASS | Leak photo 4 traced to Centre 14 with 9/9 observed features matching; next closest was Centre 08 with 3 |
 | 10 | Leak photo 5 | Identified as Centre 14 | PASS | Leak photo 5 traced to Centre 14 |
 | 11 | Leak photo 6 | Identified as Centre 14 | PASS | Leak photo 6 traced to Centre 14 with 15/15 observed features matching; next closest was Centre 13 with 7 |
-| 12 | Fake leak photo 7 | INCONCLUSIVE | NOT TESTED | |
+| 12 | Fake leak photo 7 | INCONCLUSIVE | PASS | Fake leak photo was inconclusive; best match was Centre 07 with 6/15 features, below the 14-feature attribution threshold |
 | 13 | Refresh during flow | State recovers from blockchain | PASS | Refreshed Centre 14 page, reloaded the key file, and the 5/5 RELEASED blockchain state recovered successfully |
 | 14 | Phone view | Usable | PASS | Tested on iPhone |
 | 15 | Projector view | Readable | NOT TESTED | |
