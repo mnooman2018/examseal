@@ -93,3 +93,10 @@ All numbers below come from `pnpm ops simulate` (1,000 trials per row: 6,000 rea
 - **Why:** the judges are MST's; the site should look like it belongs on MST without copying its logo ("Built on MST Blockchain" as text only), and must not look AI-generated (no gradients, glow, glassmorphism or emoji).
 - **Scope (Option A):** Sampurna's `/trace` is restyled on `sampurna/trace-style` (scoped CSS module; `globals.css` untouched). Nooman restyles his own pages from the brief in `docs/STATUS.md`; Sampurna tells him. CLAUDE.md §11 text is not edited here (it needs both owners, rule 6 spirit); this entry records the change.
 - **Rejected:** restyling Nooman's pages while he is asleep (ownership, and merge conflicts with his morning work); using crimson for COMPROMISED (would read as branding, not danger).
+
+## D12: Dashboard redesign of the whole app (Option B, 29 Sep ~06:20)
+
+- **Approval (Sampurna, own words):** "B. I waive the 07:00 feature freeze for UI-only changes. I approve editing packages/frontend for style, layout and read-only display, pending Nooman's sign-off at 7. Use plain SVG, no recharts. If the shell and dashboard are done before 08:00, add the elimination grid on /trace next. Anything unfinished at 09:00 is dropped."
+- **Scope:** branch `sampurna/ui-v2`, not merged until Sampurna checks and Nooman signs off. App shell (left sidebar, top bar with exam picker and latest block, footer), MST tokens in `globals.css` (D11 palette and status rules), control room as a dashboard (KPI cards, live chain events, approvals step chart in plain SVG, centres grid), then, if time allows, the /trace elimination grid.
+- **Unchanged:** wallet writes, decryption, matching, API routes, and every data hook; the dashboard only reads data the existing hooks already fetch. No new dependency (the chart is plain SVG).
+- **For Nooman:** this overlaps the D11 style brief for your pages. Please review `sampurna/ui-v2` at 7 before applying the brief yourself, to avoid doing the same work twice.
