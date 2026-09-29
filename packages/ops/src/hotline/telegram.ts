@@ -5,7 +5,7 @@ export type TgPhotoSize = { file_id: string; file_size?: number; width: number; 
 export type TgMessage = {
   message_id: number;
   date: number;
-  chat: { id: number; type: string };
+  chat: { id: number; type: string; title?: string };
   from?: { id: number; username?: string };
   text?: string;
   caption?: string;

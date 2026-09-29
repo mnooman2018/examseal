@@ -19,11 +19,14 @@ export function makeMatcher(master: MasterPaper, codebook: CentreCode[], candida
     const observations = identifyQuestions(extraction, master);
     let scores;
     let decision;
-    let seat: number | undefined;
+    let seat: MatchOutcome["seat"];
     if (candidates) {
       const r = decideWithCandidates(observations, codebook, candidates);
       ({ scores, decision } = r);
-      seat = r.seat?.seat;
+      if (r.seat) {
+        const s = r.seat;
+        seat = { seat: s.seat, matched: s.matched, observed: s.observed, runnerUpSeat: s.runnerUpSeat, runnerUpMatched: s.runnerUpMatched };
+      }
     } else {
       scores = scoreCentres(observations, codebook);
       decision = decide(scores, observations.length);
