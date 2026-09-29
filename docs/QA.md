@@ -14,7 +14,7 @@
 | 5 | Revoked centre | Further releases skipped; centre shows DO NOT USE | PASS | Centre 14 was revoked/marked COMPROMISED, and a subsequent custodian release skipped Centre 14 |
 | 6 | Leak photo 1 | Identified as Centre 14 | PASS | Leak photo 1 traced to Centre 14 with 15/15 observed features matching; next closest was Centre 13 with 7 |
 | 7 | Leak photo 2 | Identified as Centre 14 | PASS | Leak photo 2 traced to Centre 14 |
-| 8 | Leak photo 3 | Identified as Centre 14 | NOT TESTED | |
+| 8 | Leak photo 3 | Identified as Centre 14 | PASS | Leak photo 3 traced to Centre 14 with 15/15 observed features matching; next closest was Centre 13 with 7 |
 | 9 | Leak photo 4 | Identified as Centre 14 | NOT TESTED | |
 | 10 | Leak photo 5 | Identified as Centre 14 | NOT TESTED | |
 | 11 | Leak photo 6 | Identified as Centre 14 | NOT TESTED | |
