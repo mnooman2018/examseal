@@ -23,6 +23,8 @@ Commands:
       Refuses before release time unless --wait (waits in chain time, then sends).
   candidates --exam <id> [--seats 30]
       Write the exam's seat variants (candidates.secret.json) for seat-level tracing (D9).
+  hotline --exam <id> [--auto-revoke]
+      Telegram leak hotline on this laptop: trace sent photos/text, record evidence on MST (D10).
   simulate [--trials 1000] [--seed examseal-sim-v1] [--codebooks 5]
       Run the §10 matcher simulation and write docs/SIMULATION.md (exit 2 if a target is missed).
 `;
@@ -51,6 +53,7 @@ async function main(argv: string[]): Promise<number> {
       contract: { type: "string" },
       "out-root": { type: "string" },
       seats: { type: "string" },
+      "auto-revoke": { type: "boolean" },
       custodian: { type: "string" },
       wait: { type: "boolean" },
       "secrets-root": { type: "string" },
@@ -103,6 +106,10 @@ async function main(argv: string[]): Promise<number> {
     case "candidates": {
       const { candidates } = await import("./candidates");
       return candidates({ exam: values.exam, seats: values.seats, paper: values.paper, secretsRoot: values["secrets-root"] });
+    }
+    case "hotline": {
+      const { hotline } = await import("./hotline/index");
+      return hotline({ exam: values.exam, autoRevoke: values["auto-revoke"] });
     }
     case "simulate": {
       const { simulate } = await import("./simulate");
