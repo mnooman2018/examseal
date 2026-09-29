@@ -90,3 +90,30 @@ export async function fetchCiphertext(examId: bigint, centreId: number, register
   const d = decodeEventLog({ abi: registry.abi, data: logs[0].data, topics: logs[0].topics as [Hex, ...Hex[]] });
   return (d.args as { ciphertext: Hex }).ciphertext;
 }
+
+export type RegistryEvent = CustodyEvent;
+
+/**
+ * Named registry events across ALL exams in [fromBlock, toBlock], in 2,000-block chunks with retry
+ * (no exam topic filter). Used by /radar for LeakRecorded and CentreRevoked.
+ */
+export async function fetchRegistryEvents(names: readonly TimelineEventName[], fromBlock: bigint, toBlock: bigint): Promise<RegistryEvent[]> {
+  const topic0 = names.map(selectorOf);
+  const out: RegistryEvent[] = [];
+  for (let from = fromBlock; from <= toBlock; from += CHUNK) {
+    const to = from + CHUNK - 1n < toBlock ? from + CHUNK - 1n : toBlock;
+    const logs = await rawLogs(from, to, [topic0]);
+    for (const log of logs) {
+      const d = decodeEventLog({ abi: registry.abi, data: log.data, topics: log.topics as [Hex, ...Hex[]] });
+      out.push({
+        key: `${log.transactionHash}-${Number(log.logIndex)}`,
+        name: d.eventName as TimelineEventName,
+        args: (d.args ?? {}) as Record<string, unknown>,
+        blockNumber: BigInt(log.blockNumber!),
+        logIndex: Number(log.logIndex),
+        txHash: log.transactionHash!,
+      });
+    }
+  }
+  return out;
+}
