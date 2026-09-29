@@ -430,3 +430,10 @@ input, select, textarea { border-radius: 8px; }
   .side-link-active { border-color: rgba(200, 16, 46, 0.55); }
   .topbar-pill input { width: 5.5rem; }
 }
+
+/* D13 fix: long KPI values (COMPROMISED, 7-digit block numbers) must never run into the badge. */
+.kpi-main { flex: 1 1 auto; }
+.kpi-value { font-size: 1.65rem; overflow-wrap: anywhere; }
+.kpi-value-display { font-size: 1.35rem; overflow-wrap: anywhere; }
+.kpi-badge { width: 46px; height: 46px; }
+.kpi-badge svg { width: 22px; height: 22px; }
