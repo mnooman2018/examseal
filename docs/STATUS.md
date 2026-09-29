@@ -37,30 +37,24 @@ Phase 4 stretch goals (/verify, backup set, create-exam wizard) are **cut** unle
 - **`/digital` needs a header link.** The new digital exam page (D9, approved by Sampurna for your review) is merged to `main` but is only reachable by URL, because adding it to the nav would edit your `components/SiteHeader.tsx`. Please add a "Digital" entry to `NAV` there (and review `app/digital/page.tsx`, which only imports your hooks, `lib/*` and components; nothing of yours was changed).
 - **Redeploy Vercel** from `main` so the hosted site gets `/digital` and the new `/trace` (paste leaked text, seat-level results). Needs to happen before the 07:00 feature freeze or be counted as a bug-fix deploy before the 10:00 code freeze.
 
-### Style brief for your pages: MST Blockchain look (Option A, D11)
+### Style brief for your pages: MST dashboard look (D11 → D12 → D13)
 
-Sampurna approved changing §11: **crimson is the brand accent**, and **compromised stays red with diagonal stripes** so it is never confused with the brand. `/trace` already uses this look (branch `sampurna/trace-style`); copy its tokens from `packages/frontend/app/trace/trace.module.css` and fonts from `app/trace/fonts.ts`. Your pages are yours to restyle; nothing of yours was changed.
+**Updated 06:52: D13 replaces parts of the earlier brief.** Sampurna is building the whole-app dashboard on `sampurna/ui-v2` (D12; app shell, control room dashboard, /trace console) in this look. **Please review that branch before restyling anything yourself**, so the work is not done twice. Tokens: `packages/frontend/app/globals.css` on that branch.
 
-**Colours**
-| Token | Hex | Use |
-|---|---|---|
-| Background | `#0B0B0C` (panels `#121214`, inset `#18181B`) | Near-black; optional faint 32 px hairline grid at 2.5% white |
-| Lines | `#27272C` (strong `#3A3A41`) | 1px borders and hairline dividers |
-| Text | `#F2F2F3`, secondary `#A3A3AB` | Body and labels |
-| Brand crimson | `#C8102E` (hover `#A90D26`, depth `#7A0A1A`) | **Sparingly:** primary buttons, active nav tab / active tab, key numbers. Never for status. Too dark for small text on black; use it as fills, bars and large numbers only |
+| Element | Rule |
+|---|---|
+| Background | Near-black `#0A0A0B` with a soft dark-red radial glow behind the content. No 3D art |
+| Cards | About 10px corners, faint 1px border (`rgba(255,255,255,0.07)`), subtle top-to-bottom dark gradient, soft shadow |
+| Type | Title Case headings and nav in Inter (600–700), normal letter spacing. Only tiny labels are uppercase. Mono (JetBrains Mono) for hashes, addresses, block numbers |
+| Brand crimson | `#C8102E`, sparingly: primary buttons, the active nav pill, chart line, key numbers, hash links |
+| Sidebar | Line icons (inline SVG) + Title Case labels; active item is a dark-red pill with a crimson border |
+| KPI cards | Icon badge on the right with a soft glow in the state colour |
+| Charts | Red line with a red gradient fill underneath, faint grid |
+| Tables | Event types as small rounded pill badges (green released, red revoked/leak, grey routine); hash links in red |
+| Top bar | Exam picker and block number as rounded pills |
 
-**Status (never the brand colour)**
-| State | Colour | Treatment |
-|---|---|---|
-| SEALED | steel grey `#8B95A1` | outline pill |
-| RELEASE OPEN / awaiting | amber `#F0A830` | outline pill |
-| RELEASED | green `#3FBF6F` | outline pill |
-| COMPROMISED | red `#FF4D4F` | filled with diagonal stripes: `repeating-linear-gradient(135deg, #B3262A 0 8px, #5E1113 8px 16px)`, white text. The DO NOT USE banner uses the same stripes at large size |
-
-**Type**: Barlow Condensed 600–700 uppercase for headings (tight tracking, about 0.01–0.05em), Inter for body, JetBrains Mono for hashes, addresses, block numbers and chain ids. Load all three with `next/font/google` (self-hosted at build) with system fallbacks.
-**Shape**: 1px borders, corner radius 2–4px, no shadows, no gradients except the stripes and the faint grid, no glow, no glassmorphism, no emoji or sparkle icons.
-**Footer**: add "Built on MST Blockchain" as plain text (no logo), with the chain id and registry address, as on `/trace`.
-**Check**: 1280×720 (projector) and a real phone before 07:00 if possible; otherwise as a bug-fix deploy before the 10:00 code freeze.
+**Status (unchanged, never the brand colour):** SEALED steel grey `#8B95A1` · RELEASE OPEN amber `#F0A830` · RELEASED green `#3FBF6F` · **COMPROMISED red `#FF4D4F` with diagonal stripes** (`repeating-linear-gradient(135deg, #B3262A 0 8px, #5E1113 8px 16px)`), also on the DO NOT USE banner.
+**Footer:** "Built on MST Blockchain" as plain text, with chain id and registry.
 
 ## G4 plan (checked 02:25)
 
@@ -128,3 +122,4 @@ For each photo in `demo-data/leaks/`: `/trace?exam=4` → load the master paper 
 - **G3 done (verified on-chain):** Adithi, with the authority wallet 0xC028…E0Ef, recorded the evidence for exam 3 Centre 14 in block 5791620 (36/36, evidence hash 0x78c3cf08…509dbb, equal to the centre's stored lastEvidenceHash) — https://testnet.mstscan.com/tx/0xc883875bc4db86b1137eee12dfa10dbdcf75c24dc9002a94a436c5aee85a7f7c — and revoked Centre 14 in block 5791631 — https://testnet.mstscan.com/tx/0xc615bec80396f70ec08e07efd8502514017573f4775e32fd58f19de477051d38. Centre 14 is now Compromised (5/5). QA row 19 can be marked PASS with the first link.
 - 03:20: sampurna/digital (D9 stretch: seat-level tracing, pasted-text leaks, /digital) merged to main after pnpm test (124 core, 29 contract) and pnpm build passed. Live test by Sampurna: text pasted from /digital seat 7 on exam 4 traced to "Centre 14, Seat 7" (36 of 36); the old printed photo still traces to Centre 14 on exam 3.
 - 05:56: /trace restyled in the MST look on branch sampurna/trace-style (not merged; Sampurna to check). Style brief for Nooman's pages added above (D11).
+- 06:52: D13 recorded (softer dashboard look replaces D11's no-gradient/no-glow/uppercase rules); Nooman's style brief updated.
