@@ -21,11 +21,14 @@ export function ApprovalsChart({
   releaseTime,
   now,
   totalShares,
+  revoked,
 }: {
   entries: TimelineEntry[];
   releaseTime: number;
   now: number | undefined;
   totalShares: number;
+  /** Centres with status Compromised on-chain; shown next to the unlocked count when non-zero. */
+  revoked: number;
 }) {
   const released = entries.filter((e) => e.name === "ShareReleased");
   const authorized = entries.filter((e) => e.name === "ReleaseAuthorized");
@@ -91,6 +94,11 @@ export function ApprovalsChart({
         <span>
           <span style={{ display: "inline-block", width: 14, height: 2, background: "var(--green)", verticalAlign: "middle" }} /> centres unlocked{" "}
           <span className="mono">{unlocked.length}</span>
+          {revoked > 0 && (
+            <>
+              {" "}(<span className="mono">{revoked}</span> revoked)
+            </>
+          )}
         </span>
       </div>
     </div>

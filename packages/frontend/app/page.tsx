@@ -87,7 +87,7 @@ function ControlRoom() {
             </section>
             <section className="panel">
               <h2>Approvals over time</h2>
-              <ApprovalsChart entries={events.entries} releaseTime={exam.releaseTime} now={chain.now} totalShares={centres.length * exam.custodians.length} />
+              <ApprovalsChart entries={events.entries} releaseTime={exam.releaseTime} now={chain.now} totalShares={centres.length * exam.custodians.length} revoked={centres.filter((c) => c.status === "Compromised").length} />
             </section>
           </div>
 
