@@ -12,7 +12,7 @@
 | 3 | Attempt early release | Transaction is rejected; failed tx visible on MSTScan | PASS | Exam 4: Custodians 1–3 early release attempts rejected with `ReleaseNotStarted` |
 | 4 | Wrong centre key file | Clear error; application does not crash | PASS | Tested wrong file type with a custodian file and a tampered centre key; both produced clear errors without crashing or exposing the paper |
 | 5 | Revoked centre | Further releases skipped; centre shows DO NOT USE | PASS | Centre 14 was revoked/marked COMPROMISED, and a subsequent custodian release skipped Centre 14 |
-| 6 | Leak photo 1 | Identified as Centre 14 | NOT TESTED | |
+| 6 | Leak photo 1 | Identified as Centre 14 | PASS | Leak photo 1 traced to Centre 14 with 15/15 observed features matching; next closest was Centre 13 with 7 |
 | 7 | Leak photo 2 | Identified as Centre 14 | NOT TESTED | |
 | 8 | Leak photo 3 | Identified as Centre 14 | NOT TESTED | |
 | 9 | Leak photo 4 | Identified as Centre 14 | NOT TESTED | |
