@@ -109,3 +109,7 @@ All numbers below come from `pnpm ops simulate` (1,000 trials per row: 6,000 rea
 - **Scope:** `sampurna/ui-v2` (D12), style only, no logic changes. Nooman: the STATUS brief is updated to match.
 - **Update (29 Sep ~08:30): Nooman's final polish replaced parts of D13** (branch `nooman/legal-pages`, merged to main): buttons, inputs, nav items and the top-bar controls are capped at **6px** corners (no pill shapes); the **red radial background glow is removed** (flat dark background; the KPI icon badges keep their soft glow); and the approvals chart **legend** now also shows revoked centres next to centres unlocked, from chain status. Everything else in D13 stands (Title Case, 10px gradient cards, icon sidebar, red area chart, event pills, striped COMPROMISED).
 
+
+## D14: Hotline v2 (29 Sep)
+
+- **Approval:** Sampurna approved Nooman editing `packages/ops` (and `packages/core` only if strictly needed) for the hotline v2 upgrade.
