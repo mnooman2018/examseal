@@ -29,6 +29,7 @@ import { type CompressedPhoto, compressPhoto } from "./photo";
 import { parseCandidatesFile, parseCodebookFile, parseMasterPaperFile } from "./files";
 import { EvidencePanel, FeatureTable, RankingTable, ResultCard } from "./Result";
 import { Accountability } from "./Accountability";
+import { EliminationGrid } from "./EliminationGrid";
 import styles from "./trace.module.css";
 
 export default function TracePage() {
@@ -388,19 +389,24 @@ function Trace() {
 
       {result && (
         <>
-          <ResultCard
-            decision={result.decision}
-            seat={result.seat?.seat}
-            identified={result.observations.length}
-            transcribed={transcription!.extraction.questions.length}
-            source={transcription!.source}
-            seatTracing={seatsActive}
-          />
-          {matchedCentre && (
-            <div className="row">
-              <span>{centreLabel(matchedCentre.id)} on-chain:</span> <StatusPill status={matchedCentre.status} />
+          <div className={styles.console}>
+            <EliminationGrid scores={result.scores} decision={result.decision} seat={result.seat?.seat} />
+            <div className="stack">
+              <ResultCard
+                decision={result.decision}
+                seat={result.seat?.seat}
+                identified={result.observations.length}
+                transcribed={transcription!.extraction.questions.length}
+                source={transcription!.source}
+                seatTracing={seatsActive}
+              />
+              {matchedCentre && (
+                <div className="row">
+                  <span>{centreLabel(matchedCentre.id)} on-chain:</span> <StatusPill status={matchedCentre.status} />
+                </div>
+              )}
             </div>
-          )}
+          </div>
           {result.decision.best && result.observations.length > 0 && (
             <FeatureTable master={master!.paper} observations={result.observations} score={result.decision.best} seat={result.seat?.seat} />
           )}
