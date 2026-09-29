@@ -109,3 +109,11 @@ All numbers below come from `pnpm ops simulate` (1,000 trials per row: 6,000 rea
 - **Scope:** `sampurna/ui-v2` (D12), style only, no logic changes. Nooman: the STATUS brief is updated to match.
 - **Update (29 Sep ~08:30): Nooman's final polish replaced parts of D13** (branch `nooman/legal-pages`, merged to main): buttons, inputs, nav items and the top-bar controls are capped at **6px** corners (no pill shapes); the **red radial background glow is removed** (flat dark background; the KPI icon badges keep their soft glow); and the approvals chart **legend** now also shows revoked centres next to centres unlocked, from chain status. Everything else in D13 stands (Title Case, 10px gradient cards, icon sidebar, red area chart, event pills, striped COMPROMISED).
 
+
+## D14: Hotline v2 (29 Sep)
+
+- **Approval:** Sampurna approved Nooman editing `packages/ops` (and `packages/core` only if strictly needed) for the hotline v2 upgrade.
+- **What changed (branch `nooman/hotline-v2`):** `pnpm ops hotline [--exam N]` checks each leak against every exam with secret files under `demo-data/secrets` (`--exam` is now an optional filter), skipping exams that are not on this registry or whose authority is another key. The verdict uses chain time (latest block timestamp): match before `releaseTime` is "CONFIRMED PRE-EXAM LEAK", match after is "Leak after exam start", no match in any exam is "Not a match, possibly a fake paper". Photos posted in a group the bot is in are scanned silently.
+- **Two audiences:** the sender only ever gets "Report received, thank you", so a leaker cannot use the bot to test a paper. The verdict, the matcher's scores (X of Y, runner-up), exam, centre/seat, chain and release times and MSTScan links go to `TELEGRAM_ALERT_CHAT_ID`, which is now required.
+- **Changed from D10:** anyone may send a report (they learn nothing back); `TELEGRAM_ALLOWED_CHAT_IDS` now decides whose reports can trigger `--auto-revoke`, instead of who may use the bot. Evidence is still recorded at most once per exam and centre per run.
+- **Tie rule:** demo exams share one codebook (§9), so a printed centre copy matches every demo exam equally. The hotline then uses the newest exam and names the others in the alert. A seat-level match (seat files differ per exam) picks its own exam.
