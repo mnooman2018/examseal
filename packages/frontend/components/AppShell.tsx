@@ -14,6 +14,7 @@ import { mstTestnet } from "@/lib/chains";
 import { registry } from "@/lib/registry";
 import { parseExamId, useLatestExamId } from "@/hooks/useExam";
 import { useChainTime } from "@/hooks/useChainTime";
+import { SITE, TEAM_NAMES } from "@/lib/site";
 
 type IconName = "grid" | "key" | "building" | "monitor" | "search" | "clock" | "cube" | "pulse" | "bars" | "shield";
 
@@ -214,6 +215,17 @@ export function AppShell({ children }: { children: React.ReactNode }) {
           <span>
             <strong>Built on MST Blockchain</strong>
           </span>
+          <nav className="footer-links" aria-label="Footer">
+            <Link href="/terms">Terms</Link>
+            <Link href="/privacy">Privacy</Link>
+            <a href={SITE.contractUrl} target="_blank" rel="noreferrer">
+              Verified contract on MSTScan
+            </a>
+            <a href={SITE.repo} target="_blank" rel="noreferrer">
+              GitHub
+            </a>
+          </nav>
+          <span>Team: {TEAM_NAMES}</span>
           <span className="mono">
             chain {mstTestnet.id} · registry <AddressLink address={registry.address} />
           </span>
