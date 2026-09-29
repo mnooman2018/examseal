@@ -100,3 +100,11 @@ All numbers below come from `pnpm ops simulate` (1,000 trials per row: 6,000 rea
 - **Scope:** branch `sampurna/ui-v2`, not merged until Sampurna checks and Nooman signs off. App shell (left sidebar, top bar with exam picker and latest block, footer), MST tokens in `globals.css` (D11 palette and status rules), control room as a dashboard (KPI cards, live chain events, approvals step chart in plain SVG, centres grid), then, if time allows, the /trace elimination grid.
 - **Unchanged:** wallet writes, decryption, matching, API routes, and every data hook; the dashboard only reads data the existing hooks already fetch. No new dependency (the chart is plain SVG).
 - **For Nooman:** this overlaps the D11 style brief for your pages. Please review `sampurna/ui-v2` at 7 before applying the brief yourself, to avoid doing the same work twice.
+
+## D13: Softer dashboard look, replacing parts of D11 (29 Sep ~06:50)
+
+- **Approval (Sampurna, own words):** "Yes, I'm intentionally replacing the no-gradient, no-glow and uppercase rules, record it as D13 and update Nooman's brief in STATUS." Reference: an MST Blockchain dashboard mock-up (dark, red glow, rounded cards, icon sidebar, red area chart).
+- **Replaced from D11:** "no gradients / no glow" → a soft dark-red radial glow behind the content, cards with a subtle top-to-bottom dark gradient and soft shadow, icon badges with a soft glow in their state colour, a red gradient fill under the chart line. "Condensed uppercase headings" → Title Case headings and nav in the body sans (Inter), normal letter spacing; only tiny labels stay uppercase. "1px borders, 2–4px corners" → faint borders, about 10px card corners, pill-shaped top-bar controls.
+- **Kept from D11:** crimson `#C8102E` as the brand accent used sparingly; status colours separate from the brand (sealed grey, release open amber, released green, **compromised red with diagonal stripes**); mono for hashes and block numbers; no 3D art; "Built on MST Blockchain" as text only.
+- **Scope:** `sampurna/ui-v2` (D12), style only, no logic changes. Nooman: the STATUS brief is updated to match.
+
