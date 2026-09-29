@@ -16,6 +16,7 @@ import { CentreGrid } from "@/components/CentreGrid";
 import { ErrorBanner } from "@/components/ErrorBanner";
 import { AddressLink, TxLink } from "@/components/TxLink";
 import { ApprovalsChart } from "@/components/dashboard/ApprovalsChart";
+import { Icon } from "@/components/AppShell";
 import { EventsTable } from "@/components/dashboard/EventsTable";
 
 export default function ControlRoomPage() {
@@ -138,19 +139,38 @@ function Kpis({
   const custodiansReleased = new Set(entries.filter((e) => e.name === "ShareReleased").map((e) => String(e.args.custodian).toLowerCase())).size;
   const lastTxs = Array.from(new Set([...entries].reverse().map((e) => e.txHash))).slice(0, 3);
 
+  const statusBadge = PHASE_TONE[phase].replace("tone-", "badge-");
+  const centresBadge = compromised ? "badge-bad" : released > 0 ? "badge-ok" : "badge-neutral";
+  const custodianBadge = custodiansReleased >= exam.threshold ? "badge-ok" : custodiansReleased > 0 ? "badge-pending" : "badge-neutral";
+
   return (
     <div className="kpi-grid">
       <div className="kpi">
         <span className="kpi-label">Exam status</span>
-        <span className={`kpi-value-display ${PHASE_TONE[phase]}`}>{display.label}</span>
-        <span className="kpi-sub">{display.detail ?? `${centres.length} centres · threshold ${exam.threshold} of ${exam.custodians.length}`}</span>
+        <div className="kpi-body">
+          <div className="kpi-main">
+            <span className={`kpi-value-display ${PHASE_TONE[phase]}`}>{display.label}</span>
+            <span className="kpi-sub">{display.detail ?? `${centres.length} centres · threshold ${exam.threshold} of ${exam.custodians.length}`}</span>
+          </div>
+          <span className={`kpi-badge ${statusBadge}`}>
+            <Icon name="pulse" size={24} />
+          </span>
+        </div>
       </div>
 
       <div className="kpi">
         <span className="kpi-label">Centres unlocked</span>
-        <span className="kpi-value">
-          {released}/{centres.length}
-        </span>
+        <div className="kpi-body">
+          <div className="kpi-main">
+            <span className="kpi-value">
+              {released}/{centres.length}
+            </span>
+            <span className="kpi-sub">{compromised ? `${compromised} compromised` : "none compromised"}</span>
+          </div>
+          <span className={`kpi-badge ${centresBadge}`}>
+            <Icon name="bars" size={24} />
+          </span>
+        </div>
         <div className="mini-bars" aria-hidden>
           {centres.map((c) => {
             const tone = c.status === "Compromised" ? "bad" : c.status === "Released" ? "ok" : c.approvals > 0 ? "pending" : "";
@@ -158,20 +178,33 @@ function Kpis({
             return <span key={c.id} className={`mini-bar ${tone ? `mini-bar-${tone}` : ""}`} style={{ height: `${h}%` }} title={`Centre ${c.id}: ${c.approvals}/${exam.custodians.length}`} />;
           })}
         </div>
-        <span className="kpi-sub">{compromised ? `${compromised} compromised` : "none compromised"}</span>
       </div>
 
       <div className="kpi">
         <span className="kpi-label">Custodian approvals</span>
-        <span className="kpi-value">
-          {custodiansReleased}/{exam.custodians.length}
-        </span>
+        <div className="kpi-body">
+          <div className="kpi-main">
+            <span className="kpi-value">
+              {custodiansReleased}/{exam.custodians.length}
+            </span>
+          </div>
+          <span className={`kpi-badge ${custodianBadge}`}>
+            <Icon name="shield" size={24} />
+          </span>
+        </div>
         <ChainCountdown target={exam.releaseTime} now={now} before="Release opens in" after="Release opened at" />
       </div>
 
       <div className="kpi">
         <span className="kpi-label">Latest block</span>
-        <span className="kpi-value">#{blockNumber?.toString() ?? "…"}</span>
+        <div className="kpi-body">
+          <div className="kpi-main">
+            <span className="kpi-value">#{blockNumber?.toString() ?? "…"}</span>
+          </div>
+          <span className="kpi-badge badge-brand">
+            <Icon name="cube" size={24} />
+          </span>
+        </div>
         <div className="kpi-sub stack" style={{ gap: "0.2rem" }}>
           {lastTxs.length === 0 ? "No transactions yet" : lastTxs.map((h) => <TxLink key={h} hash={h} />)}
         </div>

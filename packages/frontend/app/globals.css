@@ -315,3 +315,118 @@ th { font-family: var(--display); text-transform: uppercase; letter-spacing: 0.0
   h1 { font-size: 1.8rem; }
   .do-not-use { font-size: 1.3rem; }
 }
+
+/* =====================================================================================
+   D13: softer dashboard look (replaces D11's no-gradient / no-glow / uppercase rules).
+   Title Case headings in the body sans, soft red glow, rounded gradient cards, pill controls.
+   Status colours are unchanged and never the brand colour; COMPROMISED keeps its stripes.
+   ===================================================================================== */
+
+body {
+  background-color: #0a0a0b;
+  background-image: radial-gradient(ellipse 70% 55% at 75% -10%, rgba(200, 16, 46, 0.22), transparent 70%),
+    radial-gradient(ellipse 55% 45% at 5% 105%, rgba(122, 10, 26, 0.2), transparent 70%);
+  background-attachment: fixed;
+}
+.shell-main { background: transparent; background-image: none; }
+
+/* ---------- type: Title Case, normal spacing; tiny labels stay uppercase ---------- */
+h1 { font-family: var(--sans); font-weight: 700; font-size: 2rem; text-transform: capitalize; letter-spacing: -0.01em; }
+h2 { font-family: var(--sans); font-weight: 600; font-size: 1.05rem; text-transform: capitalize; letter-spacing: 0; }
+.eyebrow { font-family: var(--sans); font-size: 0.72rem; letter-spacing: 0.1em; font-weight: 600; }
+.eyebrow::before { width: 0.9rem; height: 2px; }
+.kpi-label, .topbar-label, th, .countdown-label {
+  font-family: var(--sans); font-weight: 600; font-size: 0.72rem; letter-spacing: 0.08em; text-transform: uppercase; color: var(--ink-soft);
+}
+.tile-name { font-family: var(--sans); font-weight: 600; text-transform: none; letter-spacing: 0; }
+.phase { font-family: var(--sans); font-size: 0.78rem; letter-spacing: 0.06em; border-radius: 8px; }
+.kpi-value-display { font-family: var(--sans); font-weight: 700; font-size: 1.7rem; letter-spacing: 0.01em; }
+button { font-family: var(--sans); font-weight: 600; text-transform: none; letter-spacing: 0; border-radius: 8px; }
+.btn-mini { border-radius: 6px; }
+input, select, textarea { border-radius: 8px; }
+
+/* ---------- cards ---------- */
+.panel, .kpi {
+  border-radius: 10px;
+  border: 1px solid rgba(255, 255, 255, 0.07);
+  background: linear-gradient(180deg, rgba(30, 30, 34, 0.94) 0%, rgba(14, 14, 16, 0.94) 100%);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.45), inset 0 1px 0 rgba(255, 255, 255, 0.035);
+}
+.tile { border-radius: 8px; border-color: rgba(255, 255, 255, 0.07); background: rgba(24, 24, 27, 0.9); }
+.fileloader { border-radius: 10px; }
+.banner, .txstatus { border-radius: 10px; }
+.do-not-use { border-radius: 10px; }
+.pill { border-radius: 999px; padding: 0.12rem 0.6rem; }
+
+/* ---------- sidebar ---------- */
+.sidebar {
+  background: linear-gradient(180deg, rgba(20, 20, 23, 0.96), rgba(11, 11, 12, 0.96));
+  border-right: 1px solid rgba(255, 255, 255, 0.06);
+  gap: 0.15rem;
+}
+.wordmark { font-family: var(--sans); font-weight: 700; font-size: 1.3rem; letter-spacing: 0.01em; display: flex; align-items: center; gap: 0.55rem; }
+.wordmark-mark { width: 0.8rem; height: 0.8rem; border-radius: 3px; background: var(--brand); box-shadow: 0 0 14px rgba(200, 16, 46, 0.6); }
+.sidebar-sub { font-family: var(--sans); font-size: 0.75rem; letter-spacing: 0.02em; }
+.side-nav { gap: 0.2rem; padding: 0 0.7rem; }
+.side-link {
+  display: flex; align-items: center; gap: 0.7rem;
+  padding: 0.55rem 0.75rem; border-radius: 8px; border: 1px solid transparent; border-left: 1px solid transparent;
+  font-family: var(--sans); font-weight: 500; font-size: 0.95rem; letter-spacing: 0; text-transform: none; color: var(--ink-soft);
+}
+.side-link:hover { background: rgba(255, 255, 255, 0.04); }
+.side-link-active {
+  color: #fff;
+  background: linear-gradient(90deg, rgba(200, 16, 46, 0.3), rgba(200, 16, 46, 0.1));
+  border-color: rgba(200, 16, 46, 0.55);
+}
+.side-link-active svg { color: #ff4d63; }
+
+/* ---------- top bar pills ---------- */
+.topbar { background: rgba(10, 10, 11, 0.9); border-bottom: 1px solid rgba(255, 255, 255, 0.06); }
+.topbar-pill {
+  display: flex; align-items: center; gap: 0.5rem;
+  border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 999px; background: rgba(20, 20, 23, 0.9);
+  padding: 0.25rem 0.3rem 0.25rem 0.85rem; color: var(--ink-soft);
+}
+.topbar-block { padding-right: 0.95rem; }
+.topbar-pill input { border: none; background: transparent; width: 7.5rem; padding: 0.3rem 0.2rem; outline: none; }
+.topbar-pill input:focus { outline: none; }
+.topbar-pill button { border-radius: 999px; padding: 0.3rem 0.9rem; }
+.topbar-pill .mono { color: var(--ink); }
+.wallet button { border-radius: 999px; }
+.wallet-address { border-radius: 999px; }
+
+/* ---------- KPI badges ---------- */
+.kpi-body { display: flex; align-items: center; justify-content: space-between; gap: 0.8rem; }
+.kpi-main { display: flex; flex-direction: column; gap: 0.35rem; min-width: 0; }
+.kpi-badge {
+  flex: none; width: 52px; height: 52px; border-radius: 50%; display: grid; place-items: center;
+  color: var(--badge); border: 1px solid color-mix(in srgb, var(--badge) 55%, transparent);
+  background: radial-gradient(circle at 50% 40%, color-mix(in srgb, var(--badge) 28%, transparent), color-mix(in srgb, var(--badge) 6%, transparent) 70%);
+  box-shadow: 0 0 22px color-mix(in srgb, var(--badge) 35%, transparent);
+}
+.badge-ok { --badge: var(--green); }
+.badge-pending { --badge: var(--amber); }
+.badge-neutral { --badge: var(--sealed); }
+.badge-bad { --badge: var(--red); }
+.badge-brand { --badge: #ff3355; }
+
+/* ---------- events table ---------- */
+.ev-pill { display: inline-block; padding: 0.14rem 0.6rem; border-radius: 999px; font-family: var(--sans); font-size: 0.76rem; font-weight: 600; border: 1px solid; white-space: nowrap; }
+.ev-ok { color: var(--green); border-color: rgba(63, 191, 111, 0.45); background: rgba(63, 191, 111, 0.1); }
+.ev-bad { color: #ff6b7d; border-color: rgba(255, 77, 79, 0.5); background: rgba(255, 77, 79, 0.1); }
+.ev-pending { color: var(--amber); border-color: rgba(240, 168, 48, 0.45); background: rgba(240, 168, 48, 0.1); }
+.ev-neutral { color: var(--ink-soft); border-color: rgba(255, 255, 255, 0.14); background: rgba(255, 255, 255, 0.04); }
+.events .link, .kpi .link { color: #ff5a6e; text-decoration-color: rgba(255, 90, 110, 0.35); }
+.events td { border-bottom-color: rgba(255, 255, 255, 0.05); }
+
+/* ---------- footer ---------- */
+.site-footer { justify-content: space-between; border-top: 1px solid rgba(255, 255, 255, 0.06); font-family: var(--sans); }
+.site-footer strong { font-family: var(--sans); font-weight: 600; font-size: 0.85rem; letter-spacing: 0.02em; text-transform: none; }
+
+@media (max-width: 900px) {
+  .side-nav { padding: 0; }
+  .side-link { border: 1px solid transparent; }
+  .side-link-active { border-color: rgba(200, 16, 46, 0.55); }
+  .topbar-pill input { width: 5.5rem; }
+}

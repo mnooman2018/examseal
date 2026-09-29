@@ -15,7 +15,7 @@ const LABEL: Record<string, string> = {
   CentreRevoked: "Centre revoked",
   FingerprintRevealed: "Fingerprint revealed",
 };
-const TONE: Record<string, string> = { ReleaseAuthorized: "tone-ok", LeakRecorded: "tone-bad", CentreRevoked: "tone-bad", ShareSkipped: "tone-pending" };
+const TONE: Record<string, string> = { ReleaseAuthorized: "ev-ok", LeakRecorded: "ev-bad", CentreRevoked: "ev-bad", ShareSkipped: "ev-pending" };
 
 export function EventsTable({ entries, now, limit = 10 }: { entries: TimelineEntry[]; now: number | undefined; limit?: number }) {
   const rows = [...entries].reverse().slice(0, limit);
@@ -37,7 +37,9 @@ export function EventsTable({ entries, now, limit = 10 }: { entries: TimelineEnt
             const centre = e.args.centreId as number | undefined;
             return (
               <tr key={e.key}>
-                <td className={`ev-name ${TONE[e.name] ?? ""}`}>{LABEL[e.name] ?? e.name}</td>
+                <td>
+                  <span className={`ev-pill ${TONE[e.name] ?? "ev-neutral"}`}>{LABEL[e.name] ?? e.name}</span>
+                </td>
                 <td>{centre !== undefined ? centreLabel(centre) : "–"}</td>
                 <td>
                   <BlockLink block={e.blockNumber} />

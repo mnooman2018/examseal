@@ -45,9 +45,18 @@ export function ApprovalsChart({
   return (
     <div className="chart">
       <svg viewBox={`0 0 ${W} ${H}`} role="img" aria-label={`Approvals over time: ${approvals.length} of ${totalShares} pieces released`}>
+        <defs>
+          <linearGradient id="approvalsFill" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0" stopColor="#ff3355" stopOpacity="0.45" />
+            <stop offset="1" stopColor="#ff3355" stopOpacity="0" />
+          </linearGradient>
+        </defs>
+        {[0.25, 0.5, 0.75].map((f) => (
+          <line key={f} x1={PAD.l + f * (W - PAD.l - PAD.r)} x2={PAD.l + f * (W - PAD.l - PAD.r)} y1={PAD.t} y2={H - PAD.b} stroke="rgba(255,255,255,0.05)" strokeWidth="1" />
+        ))}
         {ticks.map((v) => (
           <g key={v}>
-            <line x1={PAD.l} x2={W - PAD.r} y1={y(v)} y2={y(v)} stroke="var(--line)" strokeWidth="1" />
+            <line x1={PAD.l} x2={W - PAD.r} y1={y(v)} y2={y(v)} stroke="rgba(255,255,255,0.06)" strokeWidth="1" />
             <text x={PAD.l - 8} y={y(v) + 4} textAnchor="end" fontSize={FONT} fill="var(--ink-soft)" fontFamily="var(--mono)">
               {v}
             </text>
@@ -57,8 +66,9 @@ export function ApprovalsChart({
         <text x={x(releaseTime) + 5} y={PAD.t + 10} fontSize={FONT} fill="var(--amber)" fontFamily="var(--mono)">
           release {formatClock(releaseTime)}
         </text>
-        {approvals.length > 0 && <path d={stepPath(approvals, x, y, tEnd)} fill="none" stroke="var(--ink)" strokeWidth="2" />}
-        {unlocked.length > 0 && <path d={stepPath(unlocked, x, y, tEnd)} fill="none" stroke="var(--green)" strokeWidth="2" />}
+        {approvals.length > 0 && <path d={`${stepPath(approvals, x, y, tEnd)} V ${y(0)} H ${x(approvals[0].t)} Z`} fill="url(#approvalsFill)" stroke="none" />}
+        {approvals.length > 0 && <path d={stepPath(approvals, x, y, tEnd)} fill="none" stroke="#ff3355" strokeWidth="2.2" strokeLinejoin="round" />}
+        {unlocked.length > 0 && <path d={stepPath(unlocked, x, y, tEnd)} fill="none" stroke="var(--green)" strokeWidth="1.5" strokeDasharray="5 4" />}
         <text x={PAD.l} y={H - 8} fontSize={FONT} fill="var(--ink-soft)" fontFamily="var(--mono)">
           {formatClock(t0)}
         </text>
@@ -73,7 +83,7 @@ export function ApprovalsChart({
       </svg>
       <div className="row small muted" style={{ gap: "1.2rem" }}>
         <span>
-          <span style={{ display: "inline-block", width: 14, height: 2, background: "var(--ink)", verticalAlign: "middle" }} /> pieces released{" "}
+          <span style={{ display: "inline-block", width: 14, height: 2, background: "#ff3355", verticalAlign: "middle" }} /> pieces released{" "}
           <span className="mono">
             {approvals.length}/{totalShares}
           </span>
