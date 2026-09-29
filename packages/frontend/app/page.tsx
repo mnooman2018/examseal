@@ -1,15 +1,22 @@
 "use client";
 
-import { Suspense, useState } from "react";
+// Control room as a dashboard (D12). Layout and read-only display only: the data comes from the same
+// hooks as before (useExam, useChainTime) plus useCustodyEvents (the chain-of-custody scan used by
+// /exam/[id]). No writes happen on this page.
+
+import { Suspense } from "react";
 import Link from "next/link";
-import { useRouter, useSearchParams } from "next/navigation";
-import { examPhase, phaseDisplay, parseExamId, useExam, useLatestExamId } from "@/hooks/useExam";
+import { useSearchParams } from "next/navigation";
+import { type Centre, type Exam, type Phase, examPhase, parseExamId, phaseDisplay, useExam, useLatestExamId } from "@/hooks/useExam";
 import { useChainTime } from "@/hooks/useChainTime";
+import { type TimelineEntry, useCustodyEvents } from "@/hooks/useCustodyEvents";
 import { PhaseStrip } from "@/components/PhaseStrip";
 import { ChainCountdown } from "@/components/ChainCountdown";
 import { CentreGrid } from "@/components/CentreGrid";
 import { ErrorBanner } from "@/components/ErrorBanner";
-import { AddressLink } from "@/components/TxLink";
+import { AddressLink, TxLink } from "@/components/TxLink";
+import { ApprovalsChart } from "@/components/dashboard/ApprovalsChart";
+import { EventsTable } from "@/components/dashboard/EventsTable";
 
 export default function ControlRoomPage() {
   return (
@@ -19,6 +26,8 @@ export default function ControlRoomPage() {
   );
 }
 
+const PHASE_TONE: Record<Phase, string> = { Sealed: "tone-neutral", "Awaiting release": "tone-pending", Released: "tone-ok", Compromised: "tone-bad" };
+
 function ControlRoom() {
   const search = useSearchParams();
   const requested = parseExamId(search.get("exam"));
@@ -26,6 +35,8 @@ function ControlRoom() {
   const examId = requested ?? (latest.data && latest.data > 0n ? latest.data : undefined);
   const { data, error, isLoading, refetch } = useExam(examId);
   const chain = useChainTime();
+  const exam = data?.exam;
+  const events = useCustodyEvents(exam?.id, exam?.createdBlock);
 
   if (latest.error && !requested) {
     return (
@@ -38,26 +49,20 @@ function ControlRoom() {
     return (
       <main>
         <h1>Control room</h1>
-        <p className="muted">No exams on the registry yet. Seed one with <span className="mono">pnpm ops seed</span>.</p>
+        <p className="muted">
+          No exams on the registry yet. Seed one with <span className="mono">pnpm ops seed</span>.
+        </p>
       </main>
     );
   }
 
-  const exam = data?.exam;
   const centres = data?.centres ?? [];
   const phase = exam ? examPhase(exam, centres, chain.now) : "Sealed";
-  const released = centres.filter((c) => c.status === "Released").length;
-  const compromised = centres.filter((c) => c.status === "Compromised").length;
 
   return (
     <main>
-      <div className="row" style={{ justifyContent: "space-between" }}>
-        <div>
-          <div className="muted small">CONTROL ROOM · EXAM #{examId?.toString() ?? "…"}</div>
-          <h1>{exam?.title ?? (isLoading ? "Reading exam from chain…" : "—")}</h1>
-        </div>
-        <ExamPicker current={examId} latest={latest.data} />
-      </div>
+      <div className="eyebrow">Control room · Exam #{examId?.toString() ?? "…"}</div>
+      <h1>{exam?.title ?? (isLoading ? "Reading exam from chain…" : "—")}</h1>
 
       {error ? <ErrorBanner title={`Could not read exam #${examId}`} error={error} onRetry={() => refetch()} /> : null}
       {chain.error ? <ErrorBanner title="Cannot read chain time" error={chain.error} /> : null}
@@ -65,24 +70,31 @@ function ControlRoom() {
       {exam && (
         <>
           <PhaseStrip phase={phase} display={phaseDisplay(phase, centres)} />
+          <Kpis exam={exam} centres={centres} phase={phase} entries={events.entries} now={chain.now} blockNumber={chain.blockNumber} />
 
-          <div className="grid-2">
-            <div className="panel">
-              <ChainCountdown large target={exam.releaseTime} now={chain.now} before="Release opens in" after="Release opened at" />
-            </div>
-            <div className="panel row" style={{ justifyContent: "space-around" }}>
-              <Stat label="Centres" value={String(centres.length)} />
-              <Stat label="Released" value={String(released)} tone="ok" />
-              <Stat label="Compromised" value={String(compromised)} tone={compromised ? "bad" : undefined} />
-              <Stat label="Threshold" value={`${exam.threshold} of ${exam.custodians.length}`} />
-            </div>
+          <div className="dash-grid">
+            <section className="panel">
+              <div className="row" style={{ justifyContent: "space-between" }}>
+                <h2>Live chain events</h2>
+                <span className="muted small">from the registry · refreshes every 3 s</span>
+              </div>
+              {events.error ? <ErrorBanner title="Could not read events" error={events.error} /> : null}
+              {events.loading && events.entries.length === 0 ? <p className="muted">Reading events from chain…</p> : <EventsTable entries={events.entries} now={chain.now} />}
+              <div className="row" style={{ marginTop: "0.6rem" }}>
+                <Link href={`/exam/${exam.id}`}>Full chain-of-custody timeline →</Link>
+              </div>
+            </section>
+            <section className="panel">
+              <h2>Approvals over time</h2>
+              <ApprovalsChart entries={events.entries} releaseTime={exam.releaseTime} now={chain.now} totalShares={centres.length * exam.custodians.length} />
+            </section>
           </div>
 
           <section className="panel">
             <div className="row" style={{ justifyContent: "space-between" }}>
               <h2>Centres</h2>
               <span className="muted small">
-                Chain block {chain.blockNumber?.toString() ?? "…"} · refreshes every 3 s
+                Chain block <span className="mono">{chain.blockNumber?.toString() ?? "…"}</span> · refreshes every 3 s
               </span>
             </div>
             <CentreGrid exam={exam} centres={centres} />
@@ -90,7 +102,10 @@ function ControlRoom() {
 
           <section className="panel row" style={{ justifyContent: "space-between" }}>
             <div className="muted small">
-              Authority <AddressLink address={exam.authority} /> · created in block {exam.createdBlock.toString()}
+              Authority <AddressLink address={exam.authority} /> · created in block <span className="mono">{exam.createdBlock.toString()}</span> · threshold{" "}
+              <span className="mono">
+                {exam.threshold} of {exam.custodians.length}
+              </span>
             </div>
             <Link href={`/exam/${exam.id}`}>
               <button className="btn-primary">Commitments &amp; chain-of-custody timeline →</button>
@@ -102,40 +117,65 @@ function ControlRoom() {
   );
 }
 
-function Stat({ label, value, tone }: { label: string; value: string; tone?: "ok" | "bad" }) {
-  const color = tone === "ok" ? "var(--green)" : tone === "bad" ? "var(--red)" : undefined;
-  return (
-    <div style={{ textAlign: "center" }}>
-      <div className="stat" style={{ color }}>{value}</div>
-      <div className="muted small">{label.toUpperCase()}</div>
-    </div>
-  );
-}
+function Kpis({
+  exam,
+  centres,
+  phase,
+  entries,
+  now,
+  blockNumber,
+}: {
+  exam: Exam;
+  centres: Centre[];
+  phase: Phase;
+  entries: TimelineEntry[];
+  now: number | undefined;
+  blockNumber: bigint | undefined;
+}) {
+  const display = phaseDisplay(phase, centres);
+  const released = centres.filter((c) => c.status === "Released").length;
+  const compromised = centres.filter((c) => c.status === "Compromised").length;
+  const custodiansReleased = new Set(entries.filter((e) => e.name === "ShareReleased").map((e) => String(e.args.custodian).toLowerCase())).size;
+  const lastTxs = Array.from(new Set([...entries].reverse().map((e) => e.txHash))).slice(0, 3);
 
-function ExamPicker({ current, latest }: { current?: bigint; latest?: bigint }) {
-  const router = useRouter();
-  const [draft, setDraft] = useState("");
   return (
-    <form
-      className="row"
-      onSubmit={(e) => {
-        e.preventDefault();
-        const id = parseExamId(draft.trim());
-        if (id) router.push(`/?exam=${id}`);
-      }}
-    >
-      <input
-        aria-label="Exam number"
-        inputMode="numeric"
-        placeholder={`Exam # (latest ${latest?.toString() ?? "…"})`}
-        value={draft}
-        onChange={(e) => setDraft(e.target.value)}
-        style={{ width: "11rem" }}
-      />
-      <button type="submit">Open</button>
-      {current !== undefined && latest !== undefined && current !== latest && (
-        <button type="button" onClick={() => router.push("/")}>Latest</button>
-      )}
-    </form>
+    <div className="kpi-grid">
+      <div className="kpi">
+        <span className="kpi-label">Exam status</span>
+        <span className={`kpi-value-display ${PHASE_TONE[phase]}`}>{display.label}</span>
+        <span className="kpi-sub">{display.detail ?? `${centres.length} centres · threshold ${exam.threshold} of ${exam.custodians.length}`}</span>
+      </div>
+
+      <div className="kpi">
+        <span className="kpi-label">Centres unlocked</span>
+        <span className="kpi-value">
+          {released}/{centres.length}
+        </span>
+        <div className="mini-bars" aria-hidden>
+          {centres.map((c) => {
+            const tone = c.status === "Compromised" ? "bad" : c.status === "Released" ? "ok" : c.approvals > 0 ? "pending" : "";
+            const h = Math.max(15, Math.min(100, (c.approvals / exam.threshold) * 100));
+            return <span key={c.id} className={`mini-bar ${tone ? `mini-bar-${tone}` : ""}`} style={{ height: `${h}%` }} title={`Centre ${c.id}: ${c.approvals}/${exam.custodians.length}`} />;
+          })}
+        </div>
+        <span className="kpi-sub">{compromised ? `${compromised} compromised` : "none compromised"}</span>
+      </div>
+
+      <div className="kpi">
+        <span className="kpi-label">Custodian approvals</span>
+        <span className="kpi-value">
+          {custodiansReleased}/{exam.custodians.length}
+        </span>
+        <ChainCountdown target={exam.releaseTime} now={now} before="Release opens in" after="Release opened at" />
+      </div>
+
+      <div className="kpi">
+        <span className="kpi-label">Latest block</span>
+        <span className="kpi-value">#{blockNumber?.toString() ?? "…"}</span>
+        <div className="kpi-sub stack" style={{ gap: "0.2rem" }}>
+          {lastTxs.length === 0 ? "No transactions yet" : lastTxs.map((h) => <TxLink key={h} hash={h} />)}
+        </div>
+      </div>
+    </div>
   );
 }
